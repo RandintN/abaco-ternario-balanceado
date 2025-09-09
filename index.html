@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ábaco de Lógica Ternária Balanceada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #2d3748;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .abacus {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            position: relative;
+            background-color: #4a5568;
+            border: 4px solid #718096;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .center-bar {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #e2e8f0;
+            transform: translateY(-50%);
+        }
+
+        .rod {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 200px;
+            width: 56px;
+            position: relative;
+            margin: 0 1rem;
+        }
+
+        .rod-line {
+            position: absolute;
+            height: 100%;
+            width: 2px;
+            background-color: #a0aec0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .bead {
+            width: 0;
+            height: 0;
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .bead.top {
+            top: 0;
+            border-left: 26px solid transparent;
+            border-right: 26px solid transparent;
+            border-top: 26px solid #48bb78;
+        }
+
+        .bead.bottom {
+            bottom: 0;
+            border-left: 26px solid transparent;
+            border-right: 26px solid transparent;
+            border-bottom: 26px solid #48bb78;
+        }
+
+        .bead.top.active {
+            transform: translateY(74px);
+            border-top-color: #38a169;
+        }
+
+        .bead.bottom.active {
+            transform: translateY(-74px);
+            border-bottom-color: #c53030;
+        }
+
+        .power-label {
+            position: absolute;
+            bottom: -3.5rem;
+            font-size: 0.875rem;
+            color: #a0aec0;
+            text-align: center;
+            width: 100%;
+        }
+
+        .abacus-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .value-labels {
+            position: absolute;
+            right: -2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5.5rem;
+        }
+
+        .value-labels span {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #e2e8f0;
+        }
+
+        .translation-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: #4a5568;
+            color: #e2e8f0;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .translation-button:hover {
+            background-color: #6a768c;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 flex justify-center items-center min-h-screen">
+
+    <div class="container mx-auto p-8 bg-gray-800 rounded-2xl shadow-lg">
+        <button id="translation-button" class="translation-button">EN</button>
+        <h1 id="main-title" class="text-3xl font-bold mb-6 text-center text-teal-300">Ábaco Ternário Balanceado</h1>
+        <p id="description" class="text-center text-gray-400 mb-8">Clique nas contas para somar (+1) ou subtrair (-1) e ver a representação matemática.</p>
+
+        <div class="abacus flex justify-center p-4 rounded-xl relative">
+            <div class="center-bar"></div>
+            <div class="abacus-rods flex" id="abacus-rods-container">
+                <!-- Rods will be dynamically generated by JavaScript -->
+            </div>
+            <div class="value-labels">
+                <span style="transform: translateY(-1rem);">1</span>
+                <span>0</span>
+                <span style="transform: translateY(1.2rem);">-1</span>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <h2 id="total-title" class="text-xl font-semibold text-teal-300 mb-2">Valor Total</h2>
+            <div id="total-value" class="abacus-value text-4xl">0</div>
+            <div id="math-notation" class="text-gray-400 mt-4 text-sm font-mono"></div>
+        </div>
+
+        <div class="mt-8 text-center text-sm text-gray-400">
+            <button id="tutorial-toggle" class="text-teal-300 hover:text-teal-400 transition-colors">Tutorial de como usar o ábaco</button>
+        </div>
+
+        <div id="tutorial-content" class="hidden mt-8 p-6 bg-gray-700 rounded-lg">
+            <h2 id="tutorial-title" class="text-2xl font-semibold mb-4 text-white">Tutorial do Ábaco de Lógica Ternária Balanceada</h2>
+            <p id="tutorial-p1" class="text-gray-300 mb-4">Este guia rápido explica como usar o ábaco interativo de lógica ternária balanceada, que utiliza os valores <b>1</b> (positivo), <b>0</b> (neutro) e <b>-1</b> (negativo) para representar números.</p>
+            <p id="tutorial-p2" class="text-gray-300 mb-4">O ábaco é composto por várias hastes, onde cada uma representa uma potência de 3. As hastes são organizadas da direita para a esquerda, começando com \(3^0\).</p>
+            <ul class="list-disc list-inside text-gray-300 space-y-2 mb-4">
+                <li id="tutorial-li1"><strong class="text-teal-300">Primeira haste (da direita):</strong> \(3^0\) (valor 1)</li>
+                <li id="tutorial-li2"><strong class="text-teal-300">Segunda haste:</strong> \(3^1\) (valor 3)</li>
+                <li id="tutorial-li3"><strong class="text-teal-300">Terceira haste:</strong> \(3^2\) (valor 9)</li>
+                <li id="tutorial-li4">e assim por diante...</li>
+            </ul>
+
+            <h3 id="tutorial-h3-1" class="text-xl font-semibold text-white mb-2">Representando Valores com as Contas</h3>
+            <p id="tutorial-p3" class="text-gray-300 mb-4">Cada haste tem duas contas: uma na parte superior e outra na inferior. A barra horizontal central é a referência.</p>
+            <ul class="list-disc list-inside text-gray-300 space-y-2 mb-4">
+                <li id="tutorial-li5">Para representar o valor <b>1</b> (positivo): Clique na conta superior para que ela encoste na barra central.</li>
+                <li id="tutorial-li6">Para representar o valor <b>-1</b> (negativo): Clique na conta inferior para que ela encoste na barra central.</li>
+                <li id="tutorial-li7">Para representar o valor <b>0</b> (neutro): Deixe as contas distantes da barra central.</li>
+                <li id="tutorial-li8">Uma característica especial do seu ábaco é que você pode representar o <b>0</b> de duas maneiras:</li>
+            </ul>
+            <ol class="list-decimal list-inside text-gray-300 space-y-2 mb-4">
+                <li id="tutorial-li9"><strong class="text-teal-300">Forma "vazia":</strong> Nenhuma conta toca a barra central.</li>
+                <li id="tutorial-li10"><strong class="text-teal-300">Forma "balanceada":</strong> Ambas as contas (a superior e a inferior) tocam a barra, já que a soma de \(1 + (-1)\) resulta em \(0\).</li>
+            </ol>
+
+            <h3 id="tutorial-h3-2" class="text-xl font-semibold text-white mb-2">Lendo o Valor Total</h3>
+            <p id="tutorial-p4" class="text-gray-300 mb-4">O valor total do ábaco é a soma dos valores de cada haste. A aplicação calcula e exibe automaticamente o valor na base 10 (decimal). A notação matemática, como \(1 \cdot 3^1 + (-1) \cdot 3^0\), também é mostrada para ajudar a visualizar o cálculo.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const numRods = 7;
+            const abacusRodsContainer = document.getElementById('abacus-rods-container');
+            const totalValueDisplay = document.getElementById('total-value');
+            const mathNotationDisplay = document.getElementById('math-notation');
+            const rodValues = Array(numRods).fill(0);
+            const tutorialToggleBtn = document.getElementById('tutorial-toggle');
+            const tutorialContentDiv = document.getElementById('tutorial-content');
+            const translationBtn = document.getElementById('translation-button');
+
+            const translations = {
+                'pt': {
+                    'main-title': 'Ábaco Ternário Balanceado',
+                    'description': 'Clique nas contas para somar (+1) ou subtrair (-1) e ver a representação matemática.',
+                    'total-title': 'Valor Total',
+                    'tutorial-toggle': 'Tutorial de como usar o ábaco',
+                    'tutorial-title': 'Tutorial do Ábaco de Lógica Ternária Balanceada',
+                    'tutorial-p1': 'Este guia rápido explica como usar o ábaco interativo de lógica ternária balanceada, que utiliza os valores <b>1</b> (positivo), <b>0</b> (neutro) e <b>-1</b> (negativo) para representar números.',
+                    'tutorial-p2': 'O ábaco é composto por várias hastes, onde cada uma representa uma potência de 3. As hastes são organizadas da direita para a esquerda, começando com \\(3^0\\).',
+                    'tutorial-li1': '<b>Primeira haste (da direita):</b> \\(3^0\\) (valor 1)',
+                    'tutorial-li2': '<b>Segunda haste:</b> \\(3^1\\) (valor 3)',
+                    'tutorial-li3': '<b>Terceira haste:</b> \\(3^2\\) (valor 9)',
+                    'tutorial-li4': 'e assim por diante...',
+                    'tutorial-h3-1': 'Representando Valores com as Contas',
+                    'tutorial-p3': 'Cada haste tem duas contas: uma na parte superior e outra na inferior. A barra horizontal central é a referência.',
+                    'tutorial-li5': 'Para representar o valor <b>1</b> (positivo): Clique na conta superior para que ela encoste na barra central.',
+                    'tutorial-li6': 'Para representar o valor <b>-1</b> (negativo): Clique na conta inferior para que ela encoste na barra central.',
+                    'tutorial-li7': 'Para representar o valor <b>0</b> (neutro): Deixe as contas distantes da barra central.',
+                    'tutorial-li8': 'Uma característica especial do seu ábaco é que você pode representar o <b>0</b> de duas maneiras:',
+                    'tutorial-li9': '<b>Forma "vazia":</b> Nenhuma conta toca a barra central.',
+                    'tutorial-li10': '<b>Forma "balanceada":</b> Ambas as contas (a superior e a inferior) tocam a barra, já que a soma de \\(1 + (-1)\\) resulta em \\(0\\).',
+                    'tutorial-h3-2': 'Lendo o Valor Total',
+                    'tutorial-p4': 'O valor total do ábaco é a soma dos valores de cada haste. A aplicação calcula e exibe automaticamente o valor na base 10 (decimal). A notação matemática, como \\(1 \\cdot 3^1 + (-1) \\cdot 3^0\\), também é mostrada para ajudar a visualizar o cálculo.'
+                },
+                'en': {
+                    'main-title': 'Balanced Ternary Abacus',
+                    'description': 'Click the beads to add (+1) or subtract (-1) and see the mathematical representation.',
+                    'total-title': 'Total Value',
+                    'tutorial-toggle': 'How to use the abacus tutorial',
+                    'tutorial-title': 'Balanced Ternary Abacus Tutorial',
+                    'tutorial-p1': 'This quick guide explains how to use the interactive balanced ternary abacus, which uses the values <b>1</b> (positive), <b>0</b> (neutral), and <b>-1</b> (negative) to represent numbers.',
+                    'tutorial-p2': 'The abacus consists of several rods, where each one represents a power of 3. The rods are organized from right to left, starting with \\(3^0\\).',
+                    'tutorial-li1': '<b>First rod (on the right):</b> \\(3^0\\) (value 1)',
+                    'tutorial-li2': '<b>Second rod:</b> \\(3^1\\) (value 3)',
+                    'tutorial-li3': '<b>Third rod:</b> \\(3^2\\) (value 9)',
+                    'tutorial-li4': 'and so on...',
+                    'tutorial-h3-1': 'Representing Values with the Beads',
+                    'tutorial-p3': 'Each rod has two beads: one on the top part and one on the bottom part. The central horizontal bar is the reference.',
+                    'tutorial-li5': 'To represent the value <b>1</b> (positive): Click the top bead so that it touches the central bar.',
+                    'tutorial-li6': 'To represent the value <b>-1</b> (negative): Click the bottom bead so that it touches the central bar.',
+                    'tutorial-li7': 'To represent the value <b>0</b> (neutral): Leave the beads away from the central bar.',
+                    'tutorial-li8': 'A special feature of your abacus is that you can represent <b>0</b> in two ways:',
+                    'tutorial-li9': '<b>"Empty" form:</b> No beads touch the central bar.',
+                    'tutorial-li10': '<b>"Balanced" form:</b> Both beads (the top and bottom) touch the bar, since the sum of \\(1 + (-1)\\) results in \\(0\\).',
+                    'tutorial-h3-2': 'Reading the Total Value',
+                    'tutorial-p4': 'The total value of the abacus is the sum of the values of each rod. The application automatically calculates and displays the value in base 10 (decimal). The mathematical notation, such as \\(1 \\cdot 3^1 + (-1) \\cdot 3^0\\), is also shown to help visualize the calculation.'
+                }
+            };
+
+            let currentLang = 'pt';
+
+            const updateLanguage = () => {
+                const lang = translations[currentLang];
+                document.getElementById('main-title').textContent = lang['main-title'];
+                document.getElementById('description').textContent = lang['description'];
+                document.getElementById('total-title').textContent = lang['total-title'];
+                document.getElementById('tutorial-toggle').textContent = lang['tutorial-toggle'];
+                document.getElementById('tutorial-title').textContent = lang['tutorial-title'];
+                document.getElementById('tutorial-p1').innerHTML = lang['tutorial-p1'];
+                document.getElementById('tutorial-p2').innerHTML = lang['tutorial-p2'];
+                document.getElementById('tutorial-li1').innerHTML = lang['tutorial-li1'];
+                document.getElementById('tutorial-li2').innerHTML = lang['tutorial-li2'];
+                document.getElementById('tutorial-li3').innerHTML = lang['tutorial-li3'];
+                document.getElementById('tutorial-li4').textContent = lang['tutorial-li4'];
+                document.getElementById('tutorial-h3-1').textContent = lang['tutorial-h3-1'];
+                document.getElementById('tutorial-p3').innerHTML = lang['tutorial-p3'];
+                document.getElementById('tutorial-li5').innerHTML = lang['tutorial-li5'];
+                document.getElementById('tutorial-li6').innerHTML = lang['tutorial-li6'];
+                document.getElementById('tutorial-li7').innerHTML = lang['tutorial-li7'];
+                document.getElementById('tutorial-li8').innerHTML = lang['tutorial-li8'];
+                document.getElementById('tutorial-li9').innerHTML = lang['tutorial-li9'];
+                document.getElementById('tutorial-li10').innerHTML = lang['tutorial-li10'];
+                document.getElementById('tutorial-h3-2').textContent = lang['tutorial-h3-2'];
+                document.getElementById('tutorial-p4').innerHTML = lang['tutorial-p4'];
+
+                if (window.MathJax) {
+                    window.MathJax.typesetPromise();
+                }
+            };
+
+            translationBtn.addEventListener('click', () => {
+                currentLang = currentLang === 'pt' ? 'en' : 'pt';
+                translationBtn.textContent = currentLang.toUpperCase();
+                updateLanguage();
+            });
+
+            tutorialToggleBtn.addEventListener('click', () => {
+                tutorialContentDiv.classList.toggle('hidden');
+            });
+
+            const updateDisplay = () => {
+                let total = 0;
+                let mathNotation = [];
+                for (let i = 0; i < numRods; i++) {
+                    const value = rodValues[i];
+                    total += value * Math.pow(3, i);
+                    if (value !== 0) {
+                        const sign = value === 1 ? '' : '';
+                        mathNotation.unshift(`${sign}${value} \\cdot 3^{${i}}`);
+                    }
+                }
+                
+                totalValueDisplay.textContent = total;
+                if (mathNotation.length > 0) {
+                    let notationString = '';
+                    mathNotation.forEach((term, index) => {
+                        notationString += term;
+                        if (index < mathNotation.length - 1) {
+                            notationString += ' + ';
+                        }
+                    });
+                    mathNotationDisplay.textContent = `\\( ${notationString} \\)`;
+                } else {
+                    mathNotationDisplay.textContent = '';
+                }
+                if (window.MathJax) {
+                    window.MathJax.typesetPromise();
+                }
+            };
+
+            const createAbacus = () => {
+                abacusRodsContainer.innerHTML = '';
+                for (let i = 0; i < numRods; i++) {
+                    const rod = document.createElement('div');
+                    rod.classList.add('rod');
+                    rod.setAttribute('data-index', i);
+
+                    const rodLine = document.createElement('div');
+                    rodLine.classList.add('rod-line');
+                    rod.appendChild(rodLine);
+
+                    const topBead = document.createElement('div');
+                    topBead.classList.add('bead', 'top');
+                    topBead.addEventListener('click', () => {
+                        const isTopActive = topBead.classList.toggle('active');
+                        const isBottomActive = bottomBead.classList.contains('active');
+
+                        if (isTopActive && isBottomActive) {
+                            rodValues[i] = 0; // -1 + 1 = 0
+                        } else if (isTopActive) {
+                            rodValues[i] = 1;
+                        } else if (isBottomActive) {
+                            rodValues[i] = -1;
+                        } else {
+                            rodValues[i] = 0;
+                        }
+                        updateDisplay();
+                    });
+
+                    const bottomBead = document.createElement('div');
+                    bottomBead.classList.add('bead', 'bottom');
+                    bottomBead.addEventListener('click', () => {
+                        const isBottomActive = bottomBead.classList.toggle('active');
+                        const isTopActive = topBead.classList.contains('active');
+
+                        if (isTopActive && isBottomActive) {
+                            rodValues[i] = 0; // -1 + 1 = 0
+                        } else if (isBottomActive) {
+                            rodValues[i] = -1;
+                        } else if (isTopActive) {
+                            rodValues[i] = 1;
+                        } else {
+                            rodValues[i] = 0;
+                        }
+                        updateDisplay();
+                    });
+
+                    const powerLabel = document.createElement('div');
+                    powerLabel.classList.add('power-label');
+                    powerLabel.textContent = `\\(3^{${i}}\\)`;
+
+                    rod.appendChild(topBead);
+                    rod.appendChild(bottomBead);
+                    rod.appendChild(powerLabel);
+                    abacusRodsContainer.prepend(rod);
+                }
+                updateDisplay();
+            };
+
+            createAbacus();
+        });
+    </script>
+</body>
+</html>
