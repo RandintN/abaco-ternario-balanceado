@@ -17,6 +17,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
+        :root {
+            /* Responsive sizing variables */
+            --rod-height: clamp(140px, 28vh, 220px);
+            --rod-width: clamp(32px, 8vw, 56px);
+            --bead: clamp(16px, 3.8vw, 26px);
+            /* Distance a bead travels to touch the center bar: half rod height minus bead height */
+            --bead-shift: calc(var(--rod-height) / 2 - var(--bead));
+            --center-bar: clamp(2px, 0.5vh, 4px);
+            --label-gap: clamp(2.5rem, 6vh, 5.5rem);
+            --abacus-padding: clamp(0.5rem, 2.5vw, 1rem);
+            --container-padding: clamp(1rem, 4vw, 2rem);
+            --rod-margin-x: clamp(0.25rem, 1.5vw, 1rem);
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #1a202c;
@@ -36,7 +50,7 @@
             align-items: center;
             background-color: #2d3748;
             border-radius: 1rem;
-            padding: 2rem;
+            padding: var(--container-padding);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             width: 100%;
             max-width: 600px;
@@ -51,7 +65,7 @@
             background-color: #4a5568;
             border: 4px solid #718096;
             border-radius: 0.5rem;
-            padding: 1rem;
+            padding: var(--abacus-padding);
         }
 
         .center-bar {
@@ -59,7 +73,7 @@
             top: 50%;
             left: 0;
             right: 0;
-            height: 4px;
+            height: var(--center-bar);
             background-color: #e2e8f0;
             transform: translateY(-50%);
         }
@@ -68,16 +82,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 200px;
-            width: 56px;
+            height: var(--rod-height);
+            width: var(--rod-width);
             position: relative;
-            margin: 0 1rem;
+            margin: 0 var(--rod-margin-x);
         }
 
         .rod-line {
             position: absolute;
             height: 100%;
-            width: 2px;
+            width: clamp(1px, 0.3vw, 2px);
             background-color: #a0aec0;
             left: 50%;
             transform: translateX(-50%);
@@ -93,25 +107,25 @@
 
         .bead.top {
             top: 0;
-            border-left: 26px solid transparent;
-            border-right: 26px solid transparent;
-            border-top: 26px solid #48bb78;
+            border-left: var(--bead) solid transparent;
+            border-right: var(--bead) solid transparent;
+            border-top: var(--bead) solid #48bb78;
         }
 
         .bead.bottom {
             bottom: 0;
-            border-left: 26px solid transparent;
-            border-right: 26px solid transparent;
-            border-bottom: 26px solid #48bb78;
+            border-left: var(--bead) solid transparent;
+            border-right: var(--bead) solid transparent;
+            border-bottom: var(--bead) solid #48bb78;
         }
 
         .bead.top.active {
-            transform: translateY(74px);
+            transform: translateY(var(--bead-shift));
             border-top-color: #38a169;
         }
 
         .bead.bottom.active {
-            transform: translateY(-74px);
+            transform: translateY(calc(-1 * var(--bead-shift)));
             border-bottom-color: #c53030;
         }
 
@@ -139,11 +153,11 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 5.5rem;
+            gap: var(--label-gap);
         }
 
         .value-labels span {
-            font-size: 1.25rem;
+            font-size: clamp(0.9rem, 2.8vw, 1.25rem);
             font-weight: bold;
             color: #e2e8f0;
         }
@@ -167,10 +181,15 @@
         }
 
         .triquetra-logo {
-            width: 200px;
+            width: clamp(120px, 25vw, 200px);
             height: auto;
             margin-bottom: 5rem;
             max-width: 100%;
+        }
+
+        /* Reserve space on the right so the centered title doesn't sit under the EN button */
+        #main-title {
+            padding-right: clamp(3rem, 12vw, 6rem);
         }
     </style>
 </head>
