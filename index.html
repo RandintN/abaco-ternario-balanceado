@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ábaco Ternário Balanceado</title>
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="assets/favicons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
-    <link rel="manifest" href="assets/favicon/site.webmanifest">
-    <link rel="mask-icon" href="assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicons/favicon-16x16.png">
+    <link rel="manifest" href="assets/favicons/site.webmanifest">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
 
@@ -240,7 +240,6 @@
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 flex flex-col justify-center items-center min-h-screen">
-<title id="title">Ábaco de Lógica Ternária Balanceada</title>
 <img src="assets/triquetra.png" alt="Símbolo Triquetra" class="triquetra-logo">
 <div class="container mx-auto p-8 bg-gray-800 rounded-2xl shadow-lg">
     <button id="translation-button" class="translation-button">EN</button>
@@ -564,29 +563,20 @@
 
         const updateDisplay = () => {
             let total = 0;
-            let mathNotation = [];
+            const terms = [];
             for (let i = 0; i < numRods; i++) {
                 const value = rodValues[i];
                 total += value * Math.pow(3, i);
                 if (value !== 0) {
-                    const sign = value === 1 ? '' : '';
-                    mathNotation.unshift(`${sign}${value} \\cdot 3^{${i}}`);
+                    terms.unshift(`${value} \\cdot 3^{${i}}`);
                 }
             }
 
             totalValueDisplay.textContent = total;
-            if (mathNotation.length > 0) {
-                let notationString = '';
-                mathNotation.forEach((term, index) => {
-                    notationString += term;
-                    if (index < mathNotation.length - 1) {
-                        notationString += ' + ';
-                    }
-                });
-                mathNotationDisplay.textContent = `\\( ${notationString} \\)`;
-            } else {
-                mathNotationDisplay.textContent = '';
-            }
+            mathNotationDisplay.textContent = terms.length
+                ? `\\( ${terms.join(' + ')} \\)`
+                : '';
+
             if (window.MathJax) {
                 window.MathJax.typesetPromise();
             }
@@ -675,6 +665,15 @@
 
         createAbacus();
     });
+</script>
+<script>
+// Register Service Worker for offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('service-worker.js')
+      .catch(function (err) { console.warn('SW registration failed', err); });
+  });
+}
 </script>
 </body>
 </html>
