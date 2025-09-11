@@ -29,6 +29,8 @@
             --abacus-padding: clamp(0.5rem, 2.5vw, 1rem);
             --container-padding: clamp(1rem, 4vw, 2rem);
             --rod-margin-x: clamp(0.25rem, 1.5vw, 1rem);
+            /* Size of the triad separator dot on the center bar */
+            --group-dot: clamp(6px, 1.5vw, 10px);
         }
 
         body {
@@ -63,6 +65,8 @@
             margin-bottom: 2rem;
             position: relative;
             background-color: #4a5568;
+            /* Soroban-inspired heaven/earth subtle cue */
+            background-image: linear-gradient(to bottom, rgba(255,255,255,0.04) 0 50%, rgba(0,0,0,0.08) 50% 100%);
             border: 4px solid #718096;
             border-radius: 0.5rem;
             padding: var(--abacus-padding);
@@ -101,6 +105,8 @@
             width: 0;
             height: 0;
             position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
             cursor: pointer;
             transition: transform 0.3s ease-in-out;
         }
@@ -120,12 +126,12 @@
         }
 
         .bead.top.active {
-            transform: translateY(var(--bead-shift));
+            transform: translate(-50%, var(--bead-shift));
             border-top-color: #38a169;
         }
 
         .bead.bottom.active {
-            transform: translateY(calc(-1 * var(--bead-shift)));
+            transform: translate(-50%, calc(-1 * var(--bead-shift)));
             border-bottom-color: #c53030;
         }
 
@@ -160,6 +166,26 @@
             font-size: clamp(0.9rem, 2.8vw, 1.25rem);
             font-weight: bold;
             color: #e2e8f0;
+        }
+
+        /* Soroban-inspired grouping every 3 rods for readability:
+           Replace vertical line with a centered black dot on the center bar */
+        #abacus-rods-container .rod:nth-child(3n+1) {
+            /* keep a little spacing for readability */
+            padding-left: clamp(0.25rem, 1.2vw, 0.5rem);
+        }
+        #abacus-rods-container .rod:nth-child(3n+1)::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: var(--group-dot);
+            height: var(--group-dot);
+            background: rgb(0,92,220);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            pointer-events: none;
         }
 
         .translation-button {
@@ -214,13 +240,19 @@
     </div>
 
     <div class="mt-8 text-center">
-        <h2 id="total-title" class="text-xl font-semibold text-teal-300 mb-2">Valor Total</h2>
+        <div class="flex items-center justify-center gap-3 mb-2">
+            <h2 id="total-title" class="text-xl font-semibold text-teal-300">Valor Total</h2>
+            <button id="clear-button" class="text-xs px-2 py-1 rounded-md bg-gray-600 hover:bg-gray-500 text-gray-100 border border-gray-500">Limpar</button>
+        </div>
         <div id="total-value" class="abacus-value text-4xl">0</div>
         <div id="math-notation" class="text-gray-400 mt-4 text-sm font-mono min-h-[1.25rem]"></div>
     </div>
 
-    <div class="mt-8 text-center text-sm text-gray-400">
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-6 text-center text-sm text-gray-400">
         <button id="tutorial-toggle" class="text-teal-300 hover:text-teal-400 transition-colors">👉 Tutorial de como usar o ábaco</button>
+        <button id="sum-toggle" class="text-teal-300 hover:text-teal-400 transition-colors">➕ Como somar</button>
+        <button id="sub-toggle" class="text-teal-300 hover:text-teal-400 transition-colors">➖ Como subtrair</button>
+        <button id="soroban-toggle" class="text-teal-300 hover:text-teal-400 transition-colors">💡 Dicas do Soroban</button>
     </div>
 
     <div id="tutorial-content" class="hidden mt-8 p-6 bg-gray-700 rounded-lg">
@@ -252,6 +284,41 @@
     </div>
 </div>
 
+<div id="sum-content" class="hidden mt-6 p-6 bg-gray-700 rounded-lg">
+    <h2 id="footer-sum-title" class="text-xl font-semibold text-teal-300 mb-3">Como somar no ábaco</h2>
+    <p id="footer-sum-p1" class="mb-3">Para somar dois números, você pode usar o ábaco como uma calculadora manual: primeiro represente o primeiro número; depois aplique o segundo número haste a haste.</p>
+    <ol class="list-decimal list-inside space-y-2">
+        <li id="footer-sum-li1"><strong class="text-teal-300">1) Configure o primeiro número:</strong> Clique nas contas para formar o valor desejado. O total em decimal aparece acima.</li>
+        <li id="footer-sum-li2"><strong class="text-teal-300">2) Adicione o segundo número:</strong> Comece pela haste da direita (\(3^0\)). Para cada unidade a somar, ative a conta de cima (\(+1\)); para cada unidade a subtrair, ative a de baixo (\(-1\)).</li>
+        <li id="footer-sum-li3"><strong class="text-teal-300">3) Ajuste os "vai-um" balanceados:</strong> Se uma haste ficar com duas contas ativas do mesmo lado (equivalente a \(+2\) ou \(-2\)), troque por um dígito balanceado e carregue para a próxima haste: \(+2 = -1 + 1\cdot 3\) e \(-2 = 1 - 1\cdot 3\).</li>
+    </ol>
+    <p id="footer-sum-note" class="mt-3 text-gray-400 text-sm">Dica: quando ambas as contas tocam a barra na mesma haste, o valor local é \(0\) — isso ajuda a enxergar combinações como \(1 + (-1) = 0\). Você pode conferir o resultado na leitura em decimal e na notação matemática.</p>
+</div>
+
+<div id="sub-content" class="hidden mt-6 p-6 bg-gray-700 rounded-lg">
+    <h2 id="footer-sub-title" class="text-xl font-semibold text-teal-300 mb-3">Como subtrair no ábaco</h2>
+    <p id="footer-sub-p1" class="mb-3">Para subtrair \(B\) de \(A\), você pode pensar como soma com o oposto: some \(-B\). Outra forma é aplicar as unidades a subtrair haste a haste.</p>
+    <ol class="list-decimal list-inside space-y-2">
+        <li id="footer-sub-li1"><strong class="text-teal-300">1) Configure o minuendo \(A\):</strong> Represente \(A\) no ábaco. O total em decimal aparece acima.</li>
+        <li id="footer-sub-li2"><strong class="text-teal-300">2) Subtraia o subtraendo \(B\):</strong> Comece pela haste da direita (\(3^0\)). Para cada unidade a subtrair, ative a conta de baixo (\(-1\)); para desfazer uma unidade, ative a de cima (\(+1\)).</li>
+        <li id="footer-sub-li3"><strong class="text-teal-300">3) Ajuste os "empresta" balanceados:</strong> Se uma haste chegar a \(-2\) ou \(+2\), converta usando os dígitos balanceados e faça o empréstimo/transporte:
+            \(-2 = 1 - 1\cdot 3\) (empresta \(1\) para a próxima haste) e \(+2 = -1 + 1\cdot 3\) (carrega \(1\) para a próxima haste).</li>
+    </ol>
+    <p id="footer-sub-note" class="mt-3 text-gray-400 text-sm">Dica: subtrair é o mesmo que somar o negativo. Para formar \(-B\), inverta os sinais dos dígitos de \(B\) (\(1 \leftrightarrow -1\)) e então some.</p>
+</div>
+
+<div id="soroban-content" class="hidden mt-6 p-6 bg-gray-700 rounded-lg">
+    <h2 id="soroban-title" class="text-xl font-semibold text-teal-300 mb-3">Dicas inspiradas no Soroban (ábaco japonês)</h2>
+    <p id="soroban-p1" class="mb-3">O Soroban traz práticas úteis de ergonomia e leitura que também servem para este ábaco ternário balanceado.</p>
+    <ul class="list-disc list-inside space-y-2">
+        <li id="soroban-li1"><strong class="text-teal-300">Agrupamento visual:</strong> As hastes são separadas em grupos de 3 para facilitar a leitura de potências de 3.</li>
+        <li id="soroban-li2"><strong class="text-teal-300">Céu e Terra:</strong> A área superior e a inferior têm um leve contraste, lembrando as regiões do Soroban e ajudando na referência visual.</li>
+        <li id="soroban-li3"><strong class="text-teal-300">Botão de limpeza:</strong> Use o botão “Limpar” para zerar rapidamente o ábaco, como um movimento de varredura no Soroban.</li>
+        <li id="soroban-li4"><strong class="text-teal-300">Leitura da direita para a esquerda:</strong> Comece sempre pela haste de \(3^0\) (direita) ao somar/subtrair, tal como se procede no Soroban.</li>
+        <li id="soroban-li5"><strong class="text-teal-300">Fluxo de transporte/empresta:</strong> Ao atingir \(+2\) ou \(-2\) numa haste, converta para um dígito balanceado e transporte/empreste para a próxima haste.</li>
+    </ul>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const numRods = 7;
@@ -261,6 +328,13 @@
         const rodValues = Array(numRods).fill(0);
         const tutorialToggleBtn = document.getElementById('tutorial-toggle');
         const tutorialContentDiv = document.getElementById('tutorial-content');
+        const sumToggleBtn = document.getElementById('sum-toggle');
+        const sumContentDiv = document.getElementById('sum-content');
+        const subToggleBtn = document.getElementById('sub-toggle');
+        const subContentDiv = document.getElementById('sub-content');
+        const sorobanToggleBtn = document.getElementById('soroban-toggle');
+        const sorobanContentDiv = document.getElementById('soroban-content');
+        const clearButton = document.getElementById('clear-button');
         const translationBtn = document.getElementById('translation-button');
 
         const translations = {
@@ -269,6 +343,8 @@
                 'description': 'Clique nas contas para somar (+1) ou subtrair (-1) e ver a representação matemática.',
                 'total-title': 'Valor Total',
                 'tutorial-toggle': '👉 Tutorial de como usar o ábaco',
+                'sum-toggle': '➕ Como somar',
+                                'sub-toggle': '➖ Como subtrair',
                 'tutorial-title': 'Tutorial do Ábaco de Lógica Ternária Balanceada',
                 'tutorial-p1': 'Este guia rápido explica como usar o ábaco interativo de lógica ternária balanceada, que utiliza os valores <b>1</b> (positivo), <b>0</b> (neutro) e <b>-1</b> (negativo) para representar números.',
                 'tutorial-p2': 'O ábaco é composto por várias hastes, onde cada uma representa uma potência de 3. As hastes são organizadas da direita para a esquerda, começando com \\(3^0\\).',
@@ -285,13 +361,40 @@
                 'tutorial-li9': '<strong class=\"text-teal-300\">Forma "vazia":</strong> Nenhuma conta toca a barra central.',
                 'tutorial-li10': '<strong class=\"text-teal-300\">Forma "balanceada":</strong> Ambas as contas (a superior e a inferior) tocam a barra, já que a soma de \\(1 + (-1)\\) resulta em \\(0\\).',
                 'tutorial-h3-2': 'Lendo o Valor Total',
-                'tutorial-p4': 'O valor total do ábaco é a soma dos valores de cada haste. A aplicação calcula e exibe automaticamente o valor na base 10 (decimal). A notação matemática, como \\(1 \\cdot 3^1 + (-1) \\cdot 3^0\\), também é mostrada para ajudar a visualizar o cálculo.'
-            },
+                'tutorial-p4': 'O valor total do ábaco é a soma dos valores de cada haste. A aplicação calcula e exibe automaticamente o valor na base 10 (decimal). A notação matemática, como \\(1 \\cdot 3^1 + (-1) \\cdot 3^0\\), também é mostrada para ajudar a visualizar o cálculo.',
+
+                'footer-sum-title': 'Como somar no ábaco',
+                'footer-sum-p1': 'Para somar dois números, você pode usar o ábaco como uma calculadora manual: primeiro represente o primeiro número; depois aplique o segundo número haste a haste.',
+                'footer-sum-li1': '<strong class="text-teal-300">1) Configure o primeiro número:</strong> Clique nas contas para formar o valor desejado. O total em decimal aparece acima.',
+                'footer-sum-li2': '<strong class="text-teal-300">2) Adicione o segundo número:</strong> Comece pela haste da direita (\\(3^0\\)). Para cada unidade a somar, ative a conta de cima (\\(+1\\)); para cada unidade a subtrair, ative a de baixo (\\(-1\\)).',
+                'footer-sum-li3': '<strong class="text-teal-300">3) Ajuste os "vai-um" balanceados:</strong> Se uma haste ficar com duas contas ativas do mesmo lado (equivalente a \\(+2\\) ou \\(-2\\)), troque por um dígito balanceado e carregue para a próxima haste: \\(+2 = -1 + 1\\cdot 3\\) e \\(-2 = 1 - 1\\cdot 3\\).',
+                'footer-sum-note': 'Dica: quando ambas as contas tocam a barra na mesma haste, o valor local é \\(0\\) — isso ajuda a enxergar combinações como \\(1 + (-1) = 0\\). Você pode conferir o resultado na leitura em decimal e na notação matemática.',
+
+                'footer-sub-title': 'Como subtrair no ábaco',
+                'footer-sub-p1': 'Para subtrair \\(B\\) de \\(A\\), você pode pensar como soma com o oposto: some \\(-B\\). Outra forma é aplicar as unidades a subtrair haste a haste.',
+                'footer-sub-li1': '<strong class="text-teal-300">1) Configure o minuendo \\(A\\):</strong> Represente \\(A\\) no ábaco. O total em decimal aparece acima.',
+                'footer-sub-li2': '<strong class="text-teal-300">2) Subtraia o subtraendo \\(B\\):</strong> Comece pela haste da direita (\\(3^0\\)). Para cada unidade a subtrair, ative a conta de baixo (\\(-1\\)); para desfazer uma unidade, ative a de cima (\\(+1\\)).',
+                'footer-sub-li3': '<strong class="text-teal-300">3) Ajuste os "empresta" balanceados:</strong> Se uma haste chegar a \\(-2\\) ou \\(+2\\), converta usando os dígitos balanceados e faça o empréstimo/transporte: \\(-2 = 1 - 1\\cdot 3\\) (empresta \\(1\\) para a próxima haste) e \\(+2 = -1 + 1\\cdot 3\\) (carrega \\(1\\) para a próxima haste).',
+                'footer-sub-note': 'Dica: subtrair é o mesmo que somar o negativo. Para formar \\(-B\\), inverta os sinais dos dígitos de \\(B\\) (\\(1 \\leftrightarrow -1\\)) e então some.',
+
+                /* Soroban-inspired tips */
+                'soroban-toggle': '💡 Dicas do Soroban',
+                'soroban-title': 'Dicas inspiradas no Soroban (ábaco japonês)',
+                'soroban-p1': 'O Soroban traz práticas úteis de ergonomia e leitura que também servem para este ábaco ternário balanceado.',
+                'soroban-li1': '<strong class="text-teal-300">Agrupamento visual:</strong> As hastes são separadas em grupos de 3 para facilitar a leitura de potências de 3.',
+                'soroban-li2': '<strong class="text-teal-300">Céu e Terra:</strong> A área superior e a inferior têm um leve contraste, lembrando as regiões do Soroban e ajudando na referência visual.',
+                'soroban-li3': '<strong class="text-teal-300">Botão de limpeza:</strong> Use o botão “Limpar” para zerar rapidamente o ábaco, como um movimento de varredura no Soroban.',
+                'soroban-li4': '<strong class="text-teal-300">Leitura da direita para a esquerda:</strong> Comece sempre pela haste de \\(3^0\\) (direita) ao somar/subtrair, tal como se procede no Soroban.',
+                'soroban-li5': '<strong class="text-teal-300">Fluxo de transporte/empresta:</strong> Ao atingir \\(+2\\) ou \\(-2\\) numa haste, converta para um dígito balanceado e transporte/empreste para a próxima haste.',
+                'clear-button': 'Limpar'
+                },
             'en': {
                 'main-title': 'Balanced Ternary Abacus',
                 'description': 'Click the beads to add (+1) or subtract (-1) and see the mathematical representation.',
                 'total-title': 'Total Value',
                 'tutorial-toggle': '👉 How to use the abacus tutorial',
+                'sum-toggle': '➕ How to add',
+                                'sub-toggle': '➖ How to subtract',
                 'tutorial-title': 'Balanced Ternary Abacus Tutorial',
                 'tutorial-p1': 'This quick guide explains how to use the interactive balanced ternary abacus, which uses the values <b>1</b> (positive), <b>0</b> (neutral), and <b>-1</b> (negative) to represent numbers.',
                 'tutorial-p2': 'The abacus consists of several rods, where each one represents a power of 3. The rods are organized from right to left, starting with \\(3^0\\).',
@@ -308,8 +411,33 @@
                 'tutorial-li9': '<strong class=\"text-teal-300\">"Empty" form:</strong> No beads touch the central bar.',
                 'tutorial-li10': '<strong class=\"text-teal-300\">"Balanced" form:</strong> Both beads (the top and bottom) touch the bar, since the sum of \\(1 + (-1)\\) results in \\(0\\).',
                 'tutorial-h3-2': 'Reading the Total Value',
-                'tutorial-p4': 'The total value of the abacus is the sum of the values of each rod. The application automatically calculates and displays the value in base 10 (decimal). The mathematical notation, such as \\(1 \\cdot 3^1 + (-1) \\cdot 3^0\\), also is shown to help visualize the calculation.'
-            }
+                'tutorial-p4': 'The total value of the abacus is the sum of the values of each rod. The application automatically calculates and displays the value in base 10 (decimal). The mathematical notation, such as \\(1 \\cdot 3^1 + (-1) \\cdot 3^0\\), also is shown to help visualize the calculation.',
+
+                'footer-sum-title': 'How to add using the abacus',
+                'footer-sum-p1': 'To add two numbers, use the abacus like a manual calculator: first represent the first number; then apply the second number rod by rod.',
+                'footer-sum-li1': '<strong class="text-teal-300">1) Set the first number:</strong> Click the beads to form the desired value. The decimal total is shown above.',
+                'footer-sum-li2': '<strong class="text-teal-300">2) Add the second number:</strong> Start on the rightmost rod (\\(3^0\\)). For each unit to add, activate the top bead (\\(+1\\)); for each unit to subtract, activate the bottom bead (\\(-1\\)).',
+                'footer-sum-li3': '<strong class="text-teal-300">3) Handle balanced carries:</strong> If a rod ends up with two active beads on the same side (equivalent to \\(+2\\) or \\(-2\\)), convert to a balanced digit and carry to the next rod: \\(+2 = -1 + 1\\cdot 3\\) and \\(-2 = 1 - 1\\cdot 3\\).',
+                'footer-sum-note': 'Tip: when both beads touch the bar on the same rod, the local value is \\(0\\) — this helps to see combinations like \\(1 + (-1) = 0\\). You can verify the result in the decimal reading and in the mathematical notation.',
+
+                                'footer-sub-title': 'How to subtract using the abacus',
+                                'footer-sub-p1': 'To subtract \\(B\\) from \\(A\\), think of it as addition with the opposite: add \\(-B\\). You can also apply the units to subtract rod by rod.',
+                                'footer-sub-li1': '<strong class="text-teal-300">1) Set the minuend \\(A\\):</strong> Represent \\(A\\) on the abacus. The decimal total is shown above.',
+                                'footer-sub-li2': '<strong class="text-teal-300">2) Subtract the subtrahend \\(B\\):</strong> Start on the rightmost rod (\\(3^0\\)). For each unit to subtract, activate the bottom bead (\\(-1\\)); to undo one unit, activate the top bead (\\(+1\\)).',
+                                'footer-sub-li3': '<strong class="text-teal-300">3) Handle balanced borrows:</strong> If a rod reaches \\(-2\\) or \\(+2\\), convert using balanced digits and perform the borrow/carry: \\(-2 = 1 - 1\\cdot 3\\) (borrow \\(1\\) from the next rod) and \\(+2 = -1 + 1\\cdot 3\\) (carry \\(1\\) to the next rod).',
+                                'footer-sub-note': 'Tip: subtraction is the same as adding the negative. To form \\(-B\\), flip the signs of the digits of \\(B\\) (\\(1 \\leftrightarrow -1\\)) and then add.',
+
+                                                /* Soroban-inspired tips */
+                                                'soroban-toggle': '💡 Soroban tips',
+                                                'soroban-title': 'Tips inspired by the Soroban (Japanese abacus)',
+                                                'soroban-p1': 'Soroban offers ergonomic and reading practices that are also useful for this balanced ternary abacus.',
+                                                'soroban-li1': '<strong class="text-teal-300">Visual grouping:</strong> Rods are separated into groups of 3 to ease reading of powers of 3.',
+                                                'soroban-li2': '<strong class="text-teal-300">Heaven and Earth:</strong> The top and bottom areas have a subtle contrast, recalling Soroban regions and helping visual reference.',
+                                                'soroban-li3': '<strong class="text-teal-300">Clear button:</strong> Use the “Clear” button to quickly reset the abacus, similar to a sweeping motion on the Soroban.',
+                                                'soroban-li4': '<strong class="text-teal-300">Read right-to-left:</strong> Always start with the \(3^0\) rod (right) when adding/subtracting, as done on the Soroban.',
+                                                'soroban-li5': '<strong class="text-teal-300">Carry/borrow flow:</strong> When a rod reaches \(+2\) or \(-2\), convert to a balanced digit and carry/borrow to the next rod.',
+                                                'clear-button': 'Clear'
+                                            }
         };
 
         let currentLang = 'pt';
@@ -321,6 +449,9 @@
             document.getElementById('description').textContent = lang['description'];
             document.getElementById('total-title').textContent = lang['total-title'];
             document.getElementById('tutorial-toggle').textContent = lang['tutorial-toggle'];
+            document.getElementById('sum-toggle').textContent = lang['sum-toggle'];
+            document.getElementById('sub-toggle').textContent = lang['sub-toggle'];
+            document.getElementById('soroban-toggle').textContent = lang['soroban-toggle'];
             document.getElementById('tutorial-title').textContent = lang['tutorial-title'];
             document.getElementById('tutorial-p1').innerHTML = lang['tutorial-p1'];
             document.getElementById('tutorial-p2').innerHTML = lang['tutorial-p2'];
@@ -339,6 +470,34 @@
             document.getElementById('tutorial-h3-2').textContent = lang['tutorial-h3-2'];
             document.getElementById('tutorial-p4').innerHTML = lang['tutorial-p4'];
 
+            // Footer: How to add section
+            document.getElementById('footer-sum-title').textContent = lang['footer-sum-title'];
+            document.getElementById('footer-sum-p1').innerHTML = lang['footer-sum-p1'];
+            document.getElementById('footer-sum-li1').innerHTML = lang['footer-sum-li1'];
+            document.getElementById('footer-sum-li2').innerHTML = lang['footer-sum-li2'];
+            document.getElementById('footer-sum-li3').innerHTML = lang['footer-sum-li3'];
+            document.getElementById('footer-sum-note').innerHTML = lang['footer-sum-note'];
+
+            // Footer: How to subtract section
+            document.getElementById('footer-sub-title').textContent = lang['footer-sub-title'];
+            document.getElementById('footer-sub-p1').innerHTML = lang['footer-sub-p1'];
+            document.getElementById('footer-sub-li1').innerHTML = lang['footer-sub-li1'];
+            document.getElementById('footer-sub-li2').innerHTML = lang['footer-sub-li2'];
+            document.getElementById('footer-sub-li3').innerHTML = lang['footer-sub-li3'];
+            document.getElementById('footer-sub-note').innerHTML = lang['footer-sub-note'];
+
+            // Soroban tips section
+            document.getElementById('soroban-title').textContent = lang['soroban-title'];
+            document.getElementById('soroban-p1').innerHTML = lang['soroban-p1'];
+            document.getElementById('soroban-li1').innerHTML = lang['soroban-li1'];
+            document.getElementById('soroban-li2').innerHTML = lang['soroban-li2'];
+            document.getElementById('soroban-li3').innerHTML = lang['soroban-li3'];
+            document.getElementById('soroban-li4').innerHTML = lang['soroban-li4'];
+            document.getElementById('soroban-li5').innerHTML = lang['soroban-li5'];
+
+            // Clear button label
+            document.getElementById('clear-button').textContent = lang['clear-button'];
+
             if (window.MathJax) {
                 window.MathJax.typesetPromise();
             }
@@ -352,6 +511,35 @@
 
         tutorialToggleBtn.addEventListener('click', () => {
             tutorialContentDiv.classList.toggle('hidden');
+            if (!tutorialContentDiv.classList.contains('hidden') && window.MathJax) {
+                window.MathJax.typesetPromise();
+            }
+        });
+
+        sumToggleBtn.addEventListener('click', () => {
+            sumContentDiv.classList.toggle('hidden');
+            if (!sumContentDiv.classList.contains('hidden') && window.MathJax) {
+                window.MathJax.typesetPromise();
+            }
+        });
+
+        subToggleBtn.addEventListener('click', () => {
+            subContentDiv.classList.toggle('hidden');
+            if (!subContentDiv.classList.contains('hidden') && window.MathJax) {
+                window.MathJax.typesetPromise();
+            }
+        });
+
+        sorobanToggleBtn.addEventListener('click', () => {
+            sorobanContentDiv.classList.toggle('hidden');
+            if (!sorobanContentDiv.classList.contains('hidden') && window.MathJax) {
+                window.MathJax.typesetPromise();
+            }
+        });
+
+        clearButton.addEventListener('click', () => {
+            rodValues.fill(0);
+            createAbacus();
         });
 
         const updateDisplay = () => {
