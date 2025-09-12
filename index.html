@@ -37,8 +37,11 @@
     <meta name="twitter:description" content="Ábaco Ternário Balanceado interativo. Clique nas contas para somar (+1) ou subtrair (-1) e veja a notação matemática renderizada com LaTeX.">
     <meta name="twitter:image" content="https://raw.githubusercontent.com/RandintN/abaco-ternario-balanceado/refs/heads/main/assets/triquetra.png">
 
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         :root {
             /* Responsive sizing variables */
@@ -288,7 +291,7 @@
         <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
     </svg>
 </a>
-<img src="assets/triquetra.png" alt="Símbolo Triquetra" class="triquetra-logo">
+<img src="assets/triquetra.png" alt="Símbolo Triquetra" class="triquetra-logo" loading="lazy" decoding="async" fetchpriority="high">
 <div class="container mx-auto p-8 bg-gray-800 rounded-2xl shadow-lg">
     <button id="translation-button" class="translation-button">EN</button>
     <h1 id="main-title" class="text-3xl font-bold mb-6 text-center text-teal-300">Ábaco Ternário Balanceado</h1>
@@ -485,14 +488,36 @@
             }
         };
 
+        // Lazy-load MathJax and typeset only needed containers
+        let mathJaxLoaded = false;
+        const loadMathJax = () => {
+            if (mathJaxLoaded || window.MathJax) return Promise.resolve();
+            return new Promise((resolve, reject) => {
+                window.MathJax = {
+                    startup: { typeset: false }
+                };
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+                s.async = true;
+                s.onload = () => { mathJaxLoaded = true; resolve(); };
+                s.onerror = reject;
+                document.head.appendChild(s);
+            });
+        };
+        const typesetElements = async (elements) => {
+            await loadMathJax();
+            const arr = Array.isArray(elements) ? elements : [elements];
+            return window.MathJax.typesetPromise(arr);
+        };
+
         // Utility to wire a simple show/hide toggle and typeset MathJax when shown
         const wireToggle = (btn, content) => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 content.classList.toggle('hidden');
-                if (!content.classList.contains('hidden') && window.MathJax) {
-                    window.MathJax.typesetPromise();
+                if (!content.classList.contains('hidden')) {
+                    await typesetElements(content);
                 }
-            });
+            }, { passive: true });
         };
 
         const translations = {
@@ -616,7 +641,7 @@
 
         let currentLang = 'pt';
 
-        const updateLanguage = () => {
+        const updateLanguage = async () => {
             const lang = translations[currentLang];
             document.title = lang['main-title'];
             document.getElementById('main-title').textContent = lang['main-title'];
@@ -681,9 +706,19 @@
             // Clear button label
             document.getElementById('clear-button').textContent = lang['clear-button'];
 
-            if (window.MathJax) {
-                window.MathJax.typesetPromise();
-            }
+            // Typeset only visible sections and the math notation line if present
+            const toTypeset = [];
+            const tutorialVisible = !document.getElementById('tutorial-content').classList.contains('hidden');
+            const sumVisible = !document.getElementById('sum-content').classList.contains('hidden');
+            const subVisible = !document.getElementById('sub-content').classList.contains('hidden');
+            const sorobanVisible = !document.getElementById('soroban-content').classList.contains('hidden');
+            if (tutorialVisible) toTypeset.push(document.getElementById('tutorial-content'));
+            if (sumVisible) toTypeset.push(document.getElementById('sum-content'));
+            if (subVisible) toTypeset.push(document.getElementById('sub-content'));
+            if (sorobanVisible) toTypeset.push(document.getElementById('soroban-content'));
+            const notationText = document.getElementById('math-notation').textContent || '';
+            if (notationText.includes('\\(')) toTypeset.push(document.getElementById('math-notation'));
+            if (toTypeset.length) await typesetElements(toTypeset);
         };
 
         translationBtn.addEventListener('click', () => {
@@ -703,7 +738,8 @@
             createAbacus();
         });
 
-        const updateDisplay = () => {
+        let didTypesetRods = false;
+        const updateDisplay = async () => {
             let total = 0;
             const terms = [];
             for (let i = 0; i < numRods; i++) {
@@ -719,8 +755,12 @@
                 ? `\\( ${terms.join(' + ')} \\)`
                 : '';
 
-            if (window.MathJax) {
-                window.MathJax.typesetPromise();
+            if (terms.length) {
+                await typesetElements(mathNotationDisplay);
+                if (!didTypesetRods) {
+                    await typesetElements(abacusRodsContainer);
+                    didTypesetRods = true;
+                }
             }
         };
 
@@ -767,10 +807,12 @@
                 rod.appendChild(powerLabel);
                 abacusRodsContainer.prepend(rod);
             }
-            updateDisplay();
-        };
+                updateDisplay();
+                // Ensure LaTeX power labels under each rod are typeset even when notation line is empty
+                typesetElements(abacusRodsContainer).then(() => { didTypesetRods = true; });
+            };
 
-        createAbacus();
+            createAbacus();
     });
 </script>
 <script>
