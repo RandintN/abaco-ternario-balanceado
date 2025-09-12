@@ -53,6 +53,8 @@
             --group-dot: clamp(6px, 1.5vw, 10px);
             /* Vertical offset for power labels (top and bottom) */
             --power-label-offset: clamp(4rem, 5vh, 5.5rem);
+            /* Minimum height reserved for the math notation line (prevents layout shift) */
+            --notation-minh: clamp(1.8rem, 3.5vh, 2.6rem);
         }
 
         body {
@@ -182,6 +184,12 @@
             font-weight: bold;
             margin-top: 1rem;
             text-align: center;
+        }
+
+        /* Reserve space for MathJax notation to avoid flicker/reflow when it appears */
+        #math-notation {
+            min-height: var(--notation-minh);
+            line-height: 1.4;
         }
 
         .value-labels {
@@ -417,6 +425,49 @@
         const clearButton = document.getElementById('clear-button');
         const translationBtn = document.getElementById('translation-button');
 
+        // Constants for bead colors (keep exact colors to preserve behavior)
+        const COLOR_DEFAULT = '#48bb78';
+        const COLOR_TOP_ACTIVE = 'rgb(0, 0, 255)';
+        const COLOR_BOTTOM_ACTIVE = 'rgb(197, 48, 48)';
+        const COLOR_BOTH_ACTIVE = 'white';
+
+        // Precompute powers of 3 to avoid repeated Math.pow in updates
+        const POW3 = Array.from({ length: numRods }, (_, i) => 3 ** i);
+
+        // Helper to apply the visual/logic state of a rod after a click
+        const applyRodState = (i, topBead, bottomBead) => {
+            const isTopActive = topBead.classList.contains('active');
+            const isBottomActive = bottomBead.classList.contains('active');
+
+            if (isTopActive && isBottomActive) {
+                topBead.style.borderTopColor = COLOR_BOTH_ACTIVE;
+                bottomBead.style.borderBottomColor = COLOR_BOTH_ACTIVE;
+                rodValues[i] = 0;
+            } else if (isTopActive) {
+                topBead.style.borderTopColor = COLOR_TOP_ACTIVE;
+                bottomBead.style.borderBottomColor = COLOR_DEFAULT;
+                rodValues[i] = 1;
+            } else if (isBottomActive) {
+                bottomBead.style.borderBottomColor = COLOR_BOTTOM_ACTIVE;
+                topBead.style.borderTopColor = COLOR_DEFAULT;
+                rodValues[i] = -1;
+            } else {
+                topBead.style.borderTopColor = COLOR_DEFAULT;
+                bottomBead.style.borderBottomColor = COLOR_DEFAULT;
+                rodValues[i] = 0;
+            }
+        };
+
+        // Utility to wire a simple show/hide toggle and typeset MathJax when shown
+        const wireToggle = (btn, content) => {
+            btn.addEventListener('click', () => {
+                content.classList.toggle('hidden');
+                if (!content.classList.contains('hidden') && window.MathJax) {
+                    window.MathJax.typesetPromise();
+                }
+            });
+        };
+
         const translations = {
             'pt': {
                 'main-title': 'Ábaco Ternário Balanceado',
@@ -614,33 +665,11 @@
             updateLanguage();
         });
 
-        tutorialToggleBtn.addEventListener('click', () => {
-            tutorialContentDiv.classList.toggle('hidden');
-            if (!tutorialContentDiv.classList.contains('hidden') && window.MathJax) {
-                window.MathJax.typesetPromise();
-            }
-        });
-
-        sumToggleBtn.addEventListener('click', () => {
-            sumContentDiv.classList.toggle('hidden');
-            if (!sumContentDiv.classList.contains('hidden') && window.MathJax) {
-                window.MathJax.typesetPromise();
-            }
-        });
-
-        subToggleBtn.addEventListener('click', () => {
-            subContentDiv.classList.toggle('hidden');
-            if (!subContentDiv.classList.contains('hidden') && window.MathJax) {
-                window.MathJax.typesetPromise();
-            }
-        });
-
-        sorobanToggleBtn.addEventListener('click', () => {
-            sorobanContentDiv.classList.toggle('hidden');
-            if (!sorobanContentDiv.classList.contains('hidden') && window.MathJax) {
-                window.MathJax.typesetPromise();
-            }
-        });
+        // Wire foldable sections with a small helper (behavior unchanged)
+        wireToggle(tutorialToggleBtn, tutorialContentDiv);
+        wireToggle(sumToggleBtn, sumContentDiv);
+        wireToggle(subToggleBtn, subContentDiv);
+        wireToggle(sorobanToggleBtn, sorobanContentDiv);
 
         clearButton.addEventListener('click', () => {
             rodValues.fill(0);
@@ -652,7 +681,7 @@
             const terms = [];
             for (let i = 0; i < numRods; i++) {
                 const value = rodValues[i];
-                total += value * Math.pow(3, i);
+                total += value * POW3[i];
                 if (value !== 0) {
                     terms.unshift(`${value} \\cdot 3^{${i}}`);
                 }
@@ -681,59 +710,19 @@
 
                 const topBead = document.createElement('div');
                 topBead.classList.add('bead', 'top');
-                topBead.style.borderTopColor = '#48bb78';
+                topBead.style.borderTopColor = COLOR_DEFAULT;
                 topBead.addEventListener('click', () => {
                     topBead.classList.toggle('active');
-                    const isTopActive = topBead.classList.contains('active');
-                    const isBottomActive = bottomBead.classList.contains('active');
-
-                    if (isTopActive && isBottomActive) {
-                        topBead.style.borderTopColor = 'white';
-                        bottomBead.style.borderBottomColor = 'white';
-                        rodValues[i] = 0;
-                    } else if (isTopActive) {
-                        topBead.style.borderTopColor = 'rgb(0, 0, 255)';
-                        bottomBead.style.borderBottomColor = '#48bb78';
-                        rodValues[i] = 1;
-                    } else if (isBottomActive) {
-                        bottomBead.style.borderBottomColor = 'rgb(197, 48, 48)';
-                        topBead.style.borderTopColor = '#48bb78';
-                        rodValues[i] = -1;
-                    } else {
-                        topBead.style.borderTopColor = '#48bb78';
-                        bottomBead.style.borderBottomColor = '#48bb78';
-                        rodValues[i] = 0;
-                    }
-
+                    applyRodState(i, topBead, bottomBead);
                     updateDisplay();
                 });
 
                 const bottomBead = document.createElement('div');
                 bottomBead.classList.add('bead', 'bottom');
-                bottomBead.style.borderBottomColor = '#48bb78';
+                bottomBead.style.borderBottomColor = COLOR_DEFAULT;
                 bottomBead.addEventListener('click', () => {
                     bottomBead.classList.toggle('active');
-                    const isBottomActive = bottomBead.classList.contains('active');
-                    const isTopActive = topBead.classList.contains('active');
-
-                    if (isTopActive && isBottomActive) {
-                        topBead.style.borderTopColor = 'white';
-                        bottomBead.style.borderBottomColor = 'white';
-                        rodValues[i] = 0;
-                    } else if (isBottomActive) {
-                        bottomBead.style.borderBottomColor = 'rgb(197, 48, 48)';
-                        topBead.style.borderTopColor = '#48bb78';
-                        rodValues[i] = -1;
-                    } else if (isTopActive) {
-                        topBead.style.borderTopColor = 'rgb(0, 0, 255)';
-                        bottomBead.style.borderBottomColor = '#48bb78';
-                        rodValues[i] = 1;
-                    } else {
-                        topBead.style.borderTopColor = '#48bb78';
-                        bottomBead.style.borderBottomColor = '#48bb78';
-                        rodValues[i] = 0;
-                    }
-
+                    applyRodState(i, topBead, bottomBead);
                     updateDisplay();
                 });
 
