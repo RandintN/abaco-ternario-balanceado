@@ -12,7 +12,7 @@
 ---
 
 <div align="center">
-  <img src="assets/triqueta.webp" alt="Logotipo do Hei-San-Ban" width="500"/>
+  <img src="assets/triquetra.webp" alt="Logotipo do Hei-San-Ban" width="500"/>
 </div>
 
 
