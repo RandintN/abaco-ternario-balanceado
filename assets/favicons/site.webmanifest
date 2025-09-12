@@ -1,6 +1,6 @@
 {
   "name": "Ábaco Ternário Balanceado",
-  "short_name": "Heisenban",
+  "short_name": "Heisanban",
   "description": "Ábaco Ternário Balanceado interativo. Clique nas contas para somar (+1) ou subtrair (-1) e veja a notação matemática renderizada com LaTeX.",
   "start_url": "../..",
   "scope": "../..",
