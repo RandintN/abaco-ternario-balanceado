@@ -51,6 +51,8 @@
             --rod-margin-x: clamp(0.25rem, 1.5vw, 1rem);
             /* Size of the triad separator dot on the center bar */
             --group-dot: clamp(6px, 1.5vw, 10px);
+            /* Vertical offset for power labels (top and bottom) */
+            --power-label-offset: clamp(4rem, 5vh, 5.5rem);
         }
 
         body {
@@ -82,6 +84,8 @@
         .abacus {
             display: flex;
             align-items: flex-end;
+            /* Reserve vertical space above for top decimal labels so they don't overlap the description */
+            margin-top: var(--power-label-offset);
             margin-bottom: 2rem;
             position: relative;
             background-color: #4a5568;
@@ -157,7 +161,16 @@
 
         .power-label {
             position: absolute;
-            bottom: -3.5rem;
+            bottom: calc(-1 * var(--power-label-offset));
+            font-size: 0.875rem;
+            color: #a0aec0;
+            text-align: center;
+            width: 100%;
+        }
+
+        .power-label-top {
+            position: absolute;
+            top: calc(-1 * var(--power-label-offset));
             font-size: 0.875rem;
             color: #a0aec0;
             text-align: center;
@@ -311,6 +324,30 @@
         <li id="footer-sum-li2"><strong class="text-teal-300">2) Adicione o segundo número:</strong> Comece pela haste da direita (\(3^0\)). Para cada unidade a somar, ative a conta de cima (\(+1\)); para cada unidade a subtrair, ative a de baixo (\(-1\)).</li>
         <li id="footer-sum-li3"><strong class="text-teal-300">3) Ajuste os "vai-um" balanceados:</strong> Se uma haste ficar com duas contas ativas do mesmo lado (equivalente a \(+2\) ou \(-2\)), troque por um dígito balanceado e carregue para a próxima haste: \(+2 = -1 + 1\cdot 3\) e \(-2 = 1 - 1\cdot 3\).</li>
     </ol>
+
+    <h3 id="footer-sum-table-title" class="text-lg font-semibold text-white mt-5 mb-2">Tabela de combinações para somar</h3>
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm text-gray-200">
+            <thead>
+                <tr class="text-teal-300 border-b border-gray-600">
+                    <th id="footer-sum-col1" class="text-left py-2 pr-4">Alvo (+n)</th>
+                    <th id="footer-sum-col2" class="text-left py-2">Combinação em potências de 3</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700">
+                <tr><td class="py-1 pr-4">+1</td><td class="py-1">\(+1\)</td></tr>
+                <tr><td class="py-1 pr-4">+2</td><td class="py-1">\(+3 - 1\)</td></tr>
+                <tr><td class="py-1 pr-4">+3</td><td class="py-1">\(+3\)</td></tr>
+                <tr><td class="py-1 pr-4">+4</td><td class="py-1">\(+3 + 1\)</td></tr>
+                <tr><td class="py-1 pr-4">+5</td><td class="py-1">\(+9 - 3 - 1\)</td></tr>
+                <tr><td class="py-1 pr-4">+6</td><td class="py-1">\(+9 - 3\)</td></tr>
+                <tr><td class="py-1 pr-4">+7</td><td class="py-1">\(+9 - 3 + 1\)</td></tr>
+                <tr><td class="py-1 pr-4">+8</td><td class="py-1">\(+9 - 1\)</td></tr>
+                <tr><td class="py-1 pr-4">+9</td><td class="py-1">\(+9\)</td></tr>
+            </tbody>
+        </table>
+    </div>
+
     <p id="footer-sum-note" class="mt-3 text-gray-400 text-sm">Dica: quando ambas as contas tocam a barra na mesma haste, o valor local é \(0\) — isso ajuda a enxergar combinações como \(1 + (-1) = 0\). Você pode conferir o resultado na leitura em decimal e na notação matemática.</p>
 </div>
 
@@ -323,6 +360,30 @@
         <li id="footer-sub-li3"><strong class="text-teal-300">3) Ajuste os "empresta" balanceados:</strong> Se uma haste chegar a \(-2\) ou \(+2\), converta usando os dígitos balanceados e faça o empréstimo/transporte:
             \(-2 = 1 - 1\cdot 3\) (empresta \(1\) para a próxima haste) e \(+2 = -1 + 1\cdot 3\) (carrega \(1\) para a próxima haste).</li>
     </ol>
+
+    <h3 id="footer-sub-table-title" class="text-lg font-semibold text-white mt-5 mb-2">Tabela de combinações para subtrair</h3>
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm text-gray-200">
+            <thead>
+                <tr class="text-teal-300 border-b border-gray-600">
+                    <th id="footer-sub-col1" class="text-left py-2 pr-4">Alvo (-n)</th>
+                    <th id="footer-sub-col2" class="text-left py-2">Combinação em potências de 3</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700">
+                <tr><td class="py-1 pr-4">-1</td><td class="py-1">\(-1\)</td></tr>
+                <tr><td class="py-1 pr-4">-2</td><td class="py-1">\(-3 + 1\)</td></tr>
+                <tr><td class="py-1 pr-4">-3</td><td class="py-1">\(-3\)</td></tr>
+                <tr><td class="py-1 pr-4">-4</td><td class="py-1">\(-3 - 1\)</td></tr>
+                <tr><td class="py-1 pr-4">-5</td><td class="py-1">\(-9 + 3 + 1\)</td></tr>
+                <tr><td class="py-1 pr-4">-6</td><td class="py-1">\(-9 + 3\)</td></tr>
+                <tr><td class="py-1 pr-4">-7</td><td class="py-1">\(-9 + 3 - 1\)</td></tr>
+                <tr><td class="py-1 pr-4">-8</td><td class="py-1">\(-9 + 1\)</td></tr>
+                <tr><td class="py-1 pr-4">-9</td><td class="py-1">\(-9\)</td></tr>
+            </tbody>
+        </table>
+    </div>
+
     <p id="footer-sub-note" class="mt-3 text-gray-400 text-sm">Dica: subtrair é o mesmo que somar o negativo. Para formar \(-B\), inverta os sinais dos dígitos de \(B\) (\(1 \leftrightarrow -1\)) e então some.</p>
 </div>
 
@@ -389,12 +450,20 @@
                 'footer-sum-li3': '<strong class="text-teal-300">3) Ajuste os "vai-um" balanceados:</strong> Se uma haste ficar com duas contas ativas do mesmo lado (equivalente a \\(+2\\) ou \\(-2\\)), troque por um dígito balanceado e carregue para a próxima haste: \\(+2 = -1 + 1\\cdot 3\\) e \\(-2 = 1 - 1\\cdot 3\\).',
                 'footer-sum-note': 'Dica: quando ambas as contas tocam a barra na mesma haste, o valor local é \\(0\\) — isso ajuda a enxergar combinações como \\(1 + (-1) = 0\\). Você pode conferir o resultado na leitura em decimal e na notação matemática.',
 
+                                'footer-sum-table-title': 'Tabela de combinações para somar',
+                                'footer-sum-col1': 'Alvo (+n)',
+                                'footer-sum-col2': 'Combinação em potências de 3',
+
                 'footer-sub-title': 'Como subtrair no ábaco',
                 'footer-sub-p1': 'Para subtrair \\(B\\) de \\(A\\), você pode pensar como soma com o oposto: some \\(-B\\). Outra forma é aplicar as unidades a subtrair haste a haste.',
                 'footer-sub-li1': '<strong class="text-teal-300">1) Configure o minuendo \\(A\\):</strong> Represente \\(A\\) no ábaco. O total em decimal aparece acima.',
                 'footer-sub-li2': '<strong class="text-teal-300">2) Subtraia o subtraendo \\(B\\):</strong> Comece pela haste da direita (\\(3^0\\)). Para cada unidade a subtrair, ative a conta de baixo (\\(-1\\)); para desfazer uma unidade, ative a de cima (\\(+1\\)).',
                 'footer-sub-li3': '<strong class="text-teal-300">3) Ajuste os "empresta" balanceados:</strong> Se uma haste chegar a \\(-2\\) ou \\(+2\\), converta usando os dígitos balanceados e faça o empréstimo/transporte: \\(-2 = 1 - 1\\cdot 3\\) (empresta \\(1\\) para a próxima haste) e \\(+2 = -1 + 1\\cdot 3\\) (carrega \\(1\\) para a próxima haste).',
                 'footer-sub-note': 'Dica: subtrair é o mesmo que somar o negativo. Para formar \\(-B\\), inverta os sinais dos dígitos de \\(B\\) (\\(1 \\leftrightarrow -1\\)) e então some.',
+
+                'footer-sub-table-title': 'Tabela de combinações para subtrair',
+                'footer-sub-col1': 'Alvo (-n)',
+                'footer-sub-col2': 'Combinação em potências de 3',
 
                 /* Soroban-inspired tips */
                 'soroban-toggle': '💡 Dicas do Heisanban',
@@ -439,12 +508,20 @@
                 'footer-sum-li3': '<strong class="text-teal-300">3) Handle balanced carries:</strong> If a rod ends up with two active beads on the same side (equivalent to \\(+2\\) or \\(-2\\)), convert to a balanced digit and carry to the next rod: \\(+2 = -1 + 1\\cdot 3\\) and \\(-2 = 1 - 1\\cdot 3\\).',
                 'footer-sum-note': 'Tip: when both beads touch the bar on the same rod, the local value is \\(0\\) — this helps to see combinations like \\(1 + (-1) = 0\\). You can verify the result in the decimal reading and in the mathematical notation.',
 
+                                                                'footer-sum-table-title': 'Addition combinations table',
+                                                                'footer-sum-col1': 'Target (+n)',
+                                                                'footer-sum-col2': 'Combination in powers of 3',
+
                                 'footer-sub-title': 'How to subtract using the abacus',
                                 'footer-sub-p1': 'To subtract \\(B\\) from \\(A\\), think of it as addition with the opposite: add \\(-B\\). You can also apply the units to subtract rod by rod.',
                                 'footer-sub-li1': '<strong class="text-teal-300">1) Set the minuend \\(A\\):</strong> Represent \\(A\\) on the abacus. The decimal total is shown above.',
                                 'footer-sub-li2': '<strong class="text-teal-300">2) Subtract the subtrahend \\(B\\):</strong> Start on the rightmost rod (\\(3^0\\)). For each unit to subtract, activate the bottom bead (\\(-1\\)); to undo one unit, activate the top bead (\\(+1\\)).',
                                 'footer-sub-li3': '<strong class="text-teal-300">3) Handle balanced borrows:</strong> If a rod reaches \\(-2\\) or \\(+2\\), convert using balanced digits and perform the borrow/carry: \\(-2 = 1 - 1\\cdot 3\\) (borrow \\(1\\) from the next rod) and \\(+2 = -1 + 1\\cdot 3\\) (carry \\(1\\) to the next rod).',
                                 'footer-sub-note': 'Tip: subtraction is the same as adding the negative. To form \\(-B\\), flip the signs of the digits of \\(B\\) (\\(1 \\leftrightarrow -1\\)) and then add.',
+
+                                'footer-sub-table-title': 'Subtraction combinations table',
+                                'footer-sub-col1': 'Target (-n)',
+                                'footer-sub-col2': 'Combination in powers of 3',
 
                                                 /* Soroban-inspired tips */
                                                 'soroban-toggle': '💡 Heisanban tips',
@@ -497,6 +574,11 @@
             document.getElementById('footer-sum-li3').innerHTML = lang['footer-sum-li3'];
             document.getElementById('footer-sum-note').innerHTML = lang['footer-sum-note'];
 
+            // Sum combinations table headers
+            document.getElementById('footer-sum-table-title').textContent = lang['footer-sum-table-title'];
+            document.getElementById('footer-sum-col1').textContent = lang['footer-sum-col1'];
+            document.getElementById('footer-sum-col2').textContent = lang['footer-sum-col2'];
+
             // Footer: How to subtract section
             document.getElementById('footer-sub-title').textContent = lang['footer-sub-title'];
             document.getElementById('footer-sub-p1').innerHTML = lang['footer-sub-p1'];
@@ -504,6 +586,10 @@
             document.getElementById('footer-sub-li2').innerHTML = lang['footer-sub-li2'];
             document.getElementById('footer-sub-li3').innerHTML = lang['footer-sub-li3'];
             document.getElementById('footer-sub-note').innerHTML = lang['footer-sub-note'];
+            // Subtraction combinations table headers
+            document.getElementById('footer-sub-table-title').textContent = lang['footer-sub-table-title'];
+            document.getElementById('footer-sub-col1').textContent = lang['footer-sub-col1'];
+            document.getElementById('footer-sub-col2').textContent = lang['footer-sub-col2'];
 
             // Soroban tips section
             document.getElementById('soroban-title').textContent = lang['soroban-title'];
@@ -651,12 +737,17 @@
                     updateDisplay();
                 });
 
+                const topLabel = document.createElement('div');
+                topLabel.classList.add('power-label-top');
+                topLabel.textContent = String(Math.pow(3, i));
+
                 const powerLabel = document.createElement('div');
                 powerLabel.classList.add('power-label');
                 powerLabel.textContent = `\\(3^{${i}}\\)`;
 
                 rod.appendChild(topBead);
                 rod.appendChild(bottomBead);
+                rod.appendChild(topLabel);
                 rod.appendChild(powerLabel);
                 abacusRodsContainer.prepend(rod);
             }
