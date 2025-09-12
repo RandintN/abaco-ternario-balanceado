@@ -11,6 +11,11 @@
 
 ---
 
+<div align="center">
+  <img src="assets/triqueta.webp" alt="Logotipo do Hei-San-Ban" width="500"/>
+</div>
+
+
 ## <a id="portugues"></a>🇧🇷 平三盤 (Hei-San-Ban): Ábaco Ternário Balanceado
 
 Inspirado no ábaco japonês Soroban, o **平三盤 (Hei-San-Ban)** é um ábaco computacional (físico ou digital) projetado para cálculos no sistema ternário balanceado. Diferente dos sistemas tradicionais, ele usa os dígitos **{-1, 0, +1}**, permitindo representar números positivos e negativos de forma simétrica.
