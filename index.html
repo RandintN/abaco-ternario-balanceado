@@ -258,9 +258,33 @@
         #main-title {
             padding-right: clamp(3rem, 12vw, 6rem);
         }
+        /* Fixed GitHub link at top-right of the page */
+        .github-link {
+            position: fixed;
+            top: 0.75rem;
+            right: 0.75rem;
+            color: #e2e8f0;
+            opacity: 0.9;
+            z-index: 1000;
+            transition: color 0.2s ease, opacity 0.2s ease;
+        }
+        .github-link:hover {
+            color: #63b3ed;
+            opacity: 1;
+        }
+        .github-link svg {
+            width: clamp(22px, 3.5vw, 28px);
+            height: clamp(22px, 3.5vw, 28px);
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 flex flex-col justify-center items-center min-h-screen">
+<a href="https://github.com/RandintN/abaco-ternario-balanceado" class="github-link" target="_blank" rel="noopener" aria-label="GitHub repository">
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+    </svg>
+</a>
 <img src="assets/triquetra.png" alt="Símbolo Triquetra" class="triquetra-logo">
 <div class="container mx-auto p-8 bg-gray-800 rounded-2xl shadow-lg">
     <button id="translation-button" class="translation-button">EN</button>
@@ -581,8 +605,8 @@
                                                 'soroban-li1': '<strong class="text-teal-300">Visual grouping:</strong> Rods are separated into groups of 3 to ease reading of powers of 3.',
                                                 'soroban-li2': '<strong class="text-teal-300">Heaven and Earth:</strong> The top and bottom areas have a subtle contrast, recalling Soroban regions and helping visual reference.',
                                                 'soroban-li3': '<strong class="text-teal-300">Clear button:</strong> Use the “Clear” button to quickly reset the abacus, similar to a sweeping motion on the Soroban.',
-                                                'soroban-li4': '<strong class="text-teal-300">Read right-to-left:</strong> Always start with the \(3^0\) rod (right) when adding/subtracting, as done on the Soroban.',
-                                                'soroban-li5': '<strong class="text-teal-300">Carry/borrow flow:</strong> When a rod reaches \(+2\) or \(-2\), convert to a balanced digit and carry/borrow to the next rod.',
+                                                'soroban-li4': '<strong class="text-teal-300">Read right-to-left:</strong> Always start with the \\(3^0\\) rod (right) when adding/subtracting, as done on the Soroban.',
+                                                'soroban-li5': '<strong class="text-teal-300">Carry/borrow flow:</strong> When a rod reaches \\(+2\\) or \\(-2\\), convert to a balanced digit and carry/borrow to the next rod.',
                                                 'clear-button': 'Clear'
                                             }
         };
