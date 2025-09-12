@@ -1,3 +1,8 @@
+<!--
+  Copyright (c) 2025 Robson Cassiano
+  Licensed under the MIT License. See the LICENSE file in the project root for full text.
+-->
+
 <!-- Language Selector -->
 <p align="right">
   <a href="#portugues">Português</a> ·

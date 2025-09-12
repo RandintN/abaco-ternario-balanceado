@@ -1,4 +1,7 @@
 /*
+  Copyright (c) 2025 Robson Cassiano
+  Licensed under the MIT License. See the LICENSE file in the project root for full text.
+
   Service Worker for offline support
   Caches core app shell and provides runtime caching for other requests (e.g., CDN assets).
 */
