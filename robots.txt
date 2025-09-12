@@ -1,0 +1,6 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap for better indexing
+Sitemap: https://randintn.github.io/abaco-ternario-balanceado/sitemap.xml
