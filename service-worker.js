@@ -14,7 +14,7 @@ const RUNTIME_CACHE = 'runtime-cache';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
-  './assets/triquetra.png',
+  './assets/triquetra.webp',
   './assets/favicons/favicon.ico',
   './assets/favicons/favicon-16x16.png',
   './assets/favicons/favicon-32x32.png',
