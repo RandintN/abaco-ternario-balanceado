@@ -22,8 +22,8 @@ O nome resume a essência do projeto:
 
 Este repositório contém uma implementação interativa do 平三盤, servindo como ferramenta educacional e exploração prática de computação em base 3 balanceada.
 
-- Use: https://robsoncassiano.software/tools/heisanban
-- Repositório: https://github.com/RandintN/abaco-ternario-balanceado
+- Use aqui 👉 https://robsoncassiano.software/tools/heisanban
+- Repositório 👉 https://github.com/RandintN/abaco-ternario-balanceado
 
 ### Recursos
 - Interface responsiva e interativa (contas superiores/inferiores tocam a barra central)
@@ -31,6 +31,8 @@ Este repositório contém uma implementação interativa do 平三盤, servindo 
 - Conteúdo bilíngue (PT/EN) com troca por botão
 - Dicas inspiradas no Soroban e seções dobráveis de tutorial/como somar/como subtrair
 - PWA com suporte offline após a primeira visita
+
+Vida Longa e Próspera 🖖🏻
 
 ---
 
@@ -45,8 +47,8 @@ The name captures the project’s essence:
 
 This repository hosts an interactive implementation of the Hei-San-Ban, serving as an educational tool and a practical exploration of balanced base-3 computation.
 
-- use it: https://robsoncassiano.software/tools/heisanban
-- Repository: https://github.com/RandintN/abaco-ternario-balanceado
+- Use it 👉 https://robsoncassiano.software/tools/heisanban
+- Repository 👉 https://github.com/RandintN/abaco-ternario-balanceado
 
 ### Features
 - Responsive, interactive UI (top/bottom beads touch the center bar)
@@ -54,6 +56,8 @@ This repository hosts an interactive implementation of the Hei-San-Ban, serving 
 - Bilingual content (PT/EN) with a toggle button
 - Soroban-inspired tips and foldable tutorial/add/subtract sections
 - PWA with offline support after the first visit
+
+Live Long and Prosper 🖖🏻
 
 ---
 
