@@ -1,0 +1,243 @@
+:root {
+    /* Responsive sizing variables */
+    --rod-height: clamp(140px, 28vh, 220px);
+    --rod-width: clamp(32px, 8vw, 56px);
+    --bead: clamp(16px, 3.8vw, 26px);
+    /* Distance a bead travels to touch the center bar: half rod height minus bead height */
+    --bead-shift: calc(var(--rod-height) / 2 - var(--bead));
+    --center-bar: clamp(2px, 0.5vh, 4px);
+    --label-gap: clamp(2.5rem, 6vh, 5.5rem);
+    --abacus-padding: clamp(0.5rem, 2.5vw, 1rem);
+    --container-padding: clamp(1rem, 4vw, 2rem);
+    --rod-margin-x: clamp(0.25rem, 1.5vw, 1rem);
+    /* Size of the triad separator dot on the center bar */
+    --group-dot: clamp(6px, 1.5vw, 10px);
+    /* Vertical offset for power labels (top and bottom) */
+    --power-label-offset: clamp(4rem, 5vh, 5.5rem);
+    /* Minimum height reserved for the math notation line (prevents layout shift) */
+    --notation-minh: clamp(1.8rem, 3.5vh, 2.6rem);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    background-color: #1a202c;
+    color: #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 1rem;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #2d3748;
+    border-radius: 1rem;
+    padding: var(--container-padding);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+}
+
+.abacus {
+    display: flex;
+    align-items: flex-end;
+    /* Reserve vertical space above for top decimal labels so they don't overlap the description */
+    margin-top: var(--power-label-offset);
+    margin-bottom: 2rem;
+    position: relative;
+    background-color: #4a5568;
+    /* Soroban-inspired heaven/earth subtle cue */
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0.04) 0 50%, rgba(0,0,0,0.08) 50% 100%);
+    border: 4px solid #718096;
+    border-radius: 0.5rem;
+    padding: var(--abacus-padding);
+}
+
+.center-bar {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: var(--center-bar);
+    background-color: #e2e8f0;
+    transform: translateY(-50%);
+}
+
+.rod {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: var(--rod-height);
+    width: var(--rod-width);
+    position: relative;
+    margin: 0 var(--rod-margin-x);
+}
+
+.rod-line {
+    position: absolute;
+    height: 100%;
+    width: clamp(1px, 0.3vw, 2px);
+    background-color: #a0aec0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.bead {
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+}
+
+.bead.top {
+    top: 0;
+    border-left: var(--bead) solid transparent;
+    border-right: var(--bead) solid transparent;
+    border-top: var(--bead) solid #48bb78;
+}
+
+.bead.bottom {
+    bottom: 0;
+    border-left: var(--bead) solid transparent;
+    border-right: var(--bead) solid transparent;
+    border-bottom: var(--bead) solid #48bb78;
+}
+
+.bead.top.active {
+    transform: translate(-50%, var(--bead-shift));
+    border-top-color: #38a169;
+}
+
+.bead.bottom.active {
+    transform: translate(-50%, calc(-1 * var(--bead-shift)));
+    border-bottom-color: #c53030;
+}
+
+.power-label {
+    position: absolute;
+    bottom: calc(-1 * var(--power-label-offset));
+    font-size: 0.875rem;
+    color: #a0aec0;
+    text-align: center;
+    width: 100%;
+}
+
+.power-label-top {
+    position: absolute;
+    top: calc(-1 * var(--power-label-offset));
+    font-size: 0.875rem;
+    color: #a0aec0;
+    text-align: center;
+    width: 100%;
+}
+
+.abacus-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+/* Reserve space for MathJax notation to avoid flicker/reflow when it appears */
+#math-notation {
+    min-height: var(--notation-minh);
+    line-height: 1.4;
+}
+
+.value-labels {
+    position: absolute;
+    right: -2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--label-gap);
+}
+
+.value-labels span {
+    font-size: clamp(0.9rem, 2.8vw, 1.25rem);
+    font-weight: bold;
+    color: #e2e8f0;
+}
+
+/* Soroban-inspired grouping every 3 rods for readability:
+   Replace vertical line with a centered black dot on the center bar */
+#abacus-rods-container .rod:nth-child(3n+1) {
+    /* keep a little spacing for readability */
+    padding-left: clamp(0.25rem, 1.2vw, 0.5rem);
+}
+#abacus-rods-container .rod:nth-child(3n+1)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: var(--group-dot);
+    height: var(--group-dot);
+    background: rgb(0,92,220);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.translation-button {
+    position: fixed !important;
+    top: calc(0.75rem + env(safe-area-inset-top, 0px)) !important;
+    left: calc(0.75rem + env(safe-area-inset-left, 0px)) !important;
+    background-color: #4a5568;
+    color: #e2e8f0;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    z-index: 2147483647; /* ensure always on top */
+    pointer-events: auto;
+}
+
+.translation-button:hover {
+    background-color: #6a768c;
+}
+
+.triquetra-logo {
+    width: clamp(120px, 25vw, 200px);
+    height: auto;
+    margin-bottom: 5rem;
+    max-width: 100%;
+}
+
+/* Reserve space on the left so the centered title doesn't sit under the EN button */
+#main-title {
+    padding-left: clamp(3rem, 12vw, 6rem);
+}
+/* Fixed GitHub link at top-right of the page */
+.github-link {
+    position: fixed !important;
+    top: calc(0.75rem + env(safe-area-inset-top, 0px)) !important;
+    right: calc(0.75rem + env(safe-area-inset-right, 0px)) !important;
+    color: #e2e8f0;
+    opacity: 0.9;
+    z-index: 2147483647; /* ensure always on top */
+    transition: color 0.2s ease, opacity 0.2s ease;
+    pointer-events: auto;
+}
+.github-link:hover {
+    color: #63b3ed;
+    opacity: 1;
+}
+.github-link svg {
+    width: clamp(22px, 3.5vw, 28px);
+    height: clamp(22px, 3.5vw, 28px);
+    display: block;
+}
