@@ -53,21 +53,19 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
 
-  // Navigation requests: serve cached index.html (SPA-style) when offline
+  // Navigation requests: always serve app shell (index.html) to support SPA routes on static hosts
   if (request.mode === 'navigate') {
     event.respondWith(
       (async () => {
         try {
-          // Try the network first
-          const fresh = await fetch(request);
+          const freshShell = await fetch('./index.html', { cache: 'no-cache' });
           const cache = await caches.open(APP_CACHE);
-          cache.put(request, fresh.clone());
-          return fresh;
+          cache.put('./index.html', freshShell.clone());
+          return freshShell;
         } catch (err) {
-          // Fallback to cached index.html or any cached navigation request
           const cache = await caches.open(APP_CACHE);
-          const cached = await cache.match('./index.html');
-          return cached || Response.error();
+          const cachedShell = await cache.match('./index.html');
+          return cachedShell || Response.error();
         }
       })()
     );

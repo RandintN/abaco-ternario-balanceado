@@ -224,10 +224,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const langToSeg = (lang) => lang === 'en' ? 'en-us' : 'pt-br';
 
-    const findLangInPath = () => {
+    // Read language from multiple URL shapes: ?lang=, #hash, or path segment (last resort)
+    const findLangFromUrl = () => {
         try {
+            // 1) Query string
+            const params = new URLSearchParams(location.search || '');
+            const qLang = segToLang(params.get('lang'));
+            if (qLang) return qLang;
+            // 2) Hash fragment (supports #en-us or #/en-us)
+            const hash = (location.hash || '').replace(/^#\/?/, '');
+            const hLang = segToLang(hash);
+            if (hLang) return hLang;
+            // 3) Path segments (best-effort, may 404 on static hosting if used for writing)
             const parts = (location.pathname || '/').split('/').filter(Boolean);
-            // scan from end towards start to find the first language-like segment
             for (let i = parts.length - 1; i >= 0; i--) {
                 const seg = normalizeLangSeg(parts[i]);
                 if (KNOWN_LANG_SEGMENTS.has(seg)) {
@@ -238,22 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     };
 
-    const buildBasePathWithoutLang = () => {
-        const parts = (location.pathname || '/').split('/');
-        const cleaned = [];
-        for (const p of parts) {
-            if (!p) { cleaned.push(p); continue; }
-            if (KNOWN_LANG_SEGMENTS.has(normalizeLangSeg(p))) continue; // drop lang segment
-            cleaned.push(p);
-        }
-        let path = cleaned.join('/');
-        // ensure leading slash
-        if (!path.startsWith('/')) path = '/' + path;
-        // avoid trailing double slashes
-        if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
-        return path;
-    };
-
     const applyDocumentLangMeta = () => {
         const htmlLang = currentLang === 'en' ? 'en-us' : 'pt-br';
         const ogLocale = currentLang === 'en' ? 'en_US' : 'pt_BR';
@@ -262,16 +255,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ogMeta) ogMeta.setAttribute('content', ogLocale);
     };
 
+    // Update URL in a static-host friendly way: prefer query param (?lang=...), fallback to hash
     const updateUrlForLang = (lang, usePush = false) => {
         try {
-            const base = buildBasePathWithoutLang();
-            const newPath = base === '/' ? '/' + langToSeg(lang) : base + '/' + langToSeg(lang);
+            const url = new URL(location.href);
+            url.searchParams.set('lang', langToSeg(lang));
             const fn = usePush ? history.pushState.bind(history) : history.replaceState.bind(history);
-            fn(null, '', newPath);
-        } catch (_) { /* ignore if not permitted (e.g., file://) */ }
+            fn(null, '', url.toString());
+        } catch (e) {
+            try {
+                // Fallback: hash only
+                const suffix = langToSeg(lang);
+                const newHash = '#' + suffix;
+                if (usePush) {
+                    history.pushState && history.pushState(null, '', newHash);
+                } else {
+                    location.hash = newHash;
+                }
+            } catch (_) { /* ignore */ }
+        }
     };
 
-    let currentLang = findLangInPath() || 'pt';
+    let currentLang = findLangFromUrl() || 'pt';
 
     const updateLanguage = async () => {
         // Reflect language in <html lang> and social meta
