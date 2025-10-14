@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sorobanToggleBtn = document.getElementById('soroban-toggle');
     const sorobanContentDiv = document.getElementById('soroban-content');
     const clearButton = document.getElementById('clear-button');
+    const invertButton = document.getElementById('invert-button');
     const translationBtn = document.getElementById('translation-button');
     const githubLink = document.querySelector('.github-link');
 
@@ -148,7 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
             'soroban-li3': '<strong class="text-teal-300">Botão de limpeza:</strong> Use o botão “Limpar” para zerar rapidamente o ábaco, como um movimento de varredura no Soroban.',
             'soroban-li4': '<strong class="text-teal-300">Leitura da direita para a esquerda:</strong> Comece sempre pela haste de \\(3^0\\) (direita) ao somar/subtrair, tal como se procede no Soroban.',
             'soroban-li5': '<strong class="text-teal-300">Fluxo de transporte/empresta:</strong> Ao atingir \\(+2\\) ou \\(-2\\) numa haste, converta para um dígito balanceado e transporte/empreste para a próxima haste.',
-            'clear-button': 'Limpar'
+            'clear-button': 'Limpar',
+            'invert-button': 'Inverter'
         },
         'en': {
             'main-title': 'Balanced Ternary Abacus',
@@ -206,13 +208,77 @@ document.addEventListener('DOMContentLoaded', () => {
             'soroban-li3': '<strong class="text-teal-300">Clear button:</strong> Use the “Clear” button to quickly reset the abacus, similar to a sweeping motion on the Soroban.',
             'soroban-li4': '<strong class="text-teal-300">Read right-to-left:</strong> Always start with the \\(3^0\\) rod (right) when adding/subtracting, as done on the Soroban.',
             'soroban-li5': '<strong class="text-teal-300">Carry/borrow flow:</strong> When a rod reaches \\(+2\\) or \\(-2\\), convert to a balanced digit and carry/borrow to the next rod.',
-            'clear-button': 'Clear'
+            'clear-button': 'Clear',
+            'invert-button': 'Invert'
         }
     };
 
-    let currentLang = 'pt';
+    // Language routing helpers: map URL segments to internal language keys and update document/URL
+    const KNOWN_LANG_SEGMENTS = new Set(['en', 'en-us', 'pt', 'pt-br']);
+    const normalizeLangSeg = (seg) => (seg || '').toLowerCase();
+    const segToLang = (seg) => {
+        const s = normalizeLangSeg(seg);
+        if (s === 'en' || s === 'en-us') return 'en';
+        if (s === 'pt' || s === 'pt-br') return 'pt';
+        return null;
+    };
+    const langToSeg = (lang) => lang === 'en' ? 'en-us' : 'pt-br';
+
+    const findLangInPath = () => {
+        try {
+            const parts = (location.pathname || '/').split('/').filter(Boolean);
+            // scan from end towards start to find the first language-like segment
+            for (let i = parts.length - 1; i >= 0; i--) {
+                const seg = normalizeLangSeg(parts[i]);
+                if (KNOWN_LANG_SEGMENTS.has(seg)) {
+                    return segToLang(seg);
+                }
+            }
+        } catch (_) { /* ignore */ }
+        return null;
+    };
+
+    const buildBasePathWithoutLang = () => {
+        const parts = (location.pathname || '/').split('/');
+        const cleaned = [];
+        for (const p of parts) {
+            if (!p) { cleaned.push(p); continue; }
+            if (KNOWN_LANG_SEGMENTS.has(normalizeLangSeg(p))) continue; // drop lang segment
+            cleaned.push(p);
+        }
+        let path = cleaned.join('/');
+        // ensure leading slash
+        if (!path.startsWith('/')) path = '/' + path;
+        // avoid trailing double slashes
+        if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
+        return path;
+    };
+
+    const applyDocumentLangMeta = () => {
+        const htmlLang = currentLang === 'en' ? 'en-us' : 'pt-br';
+        const ogLocale = currentLang === 'en' ? 'en_US' : 'pt_BR';
+        document.documentElement.lang = htmlLang;
+        const ogMeta = document.querySelector('meta[property="og:locale"]');
+        if (ogMeta) ogMeta.setAttribute('content', ogLocale);
+    };
+
+    const updateUrlForLang = (lang, usePush = false) => {
+        try {
+            const base = buildBasePathWithoutLang();
+            const newPath = base === '/' ? '/' + langToSeg(lang) : base + '/' + langToSeg(lang);
+            const fn = usePush ? history.pushState.bind(history) : history.replaceState.bind(history);
+            fn(null, '', newPath);
+        } catch (_) { /* ignore if not permitted (e.g., file://) */ }
+    };
+
+    let currentLang = findLangInPath() || 'pt';
 
     const updateLanguage = async () => {
+        // Reflect language in <html lang> and social meta
+        applyDocumentLangMeta();
+        // Ensure button label reflects active language
+        if (translationBtn) translationBtn.textContent = currentLang.toUpperCase();
+
         const lang = translations[currentLang];
         document.title = lang['main-title'];
         document.getElementById('main-title').textContent = lang['main-title'];
@@ -274,8 +340,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('soroban-li4').innerHTML = lang['soroban-li4'];
         document.getElementById('soroban-li5').innerHTML = lang['soroban-li5'];
 
-        // Clear button label
+        // Clear/invert buttons label
         document.getElementById('clear-button').textContent = lang['clear-button'];
+        const invertBtnEl = document.getElementById('invert-button');
+        if (invertBtnEl) invertBtnEl.textContent = lang['invert-button'];
 
         // Typeset only visible sections and the math notation line if present
         const toTypeset = [];
@@ -294,8 +362,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     translationBtn.addEventListener('click', () => {
         currentLang = currentLang === 'pt' ? 'en' : 'pt';
-        translationBtn.textContent = currentLang.toUpperCase();
         updateLanguage();
+        // Update the URL to reflect the selected language
+        updateUrlForLang(currentLang, true);
     });
 
     // Wire foldable sections with a small helper (behavior unchanged)
@@ -308,6 +377,36 @@ document.addEventListener('DOMContentLoaded', () => {
         rodValues.fill(0);
         createAbacus();
     });
+
+    // Invert the abacus: flip signs (+1 <-> -1) per rod while preserving both-active and both-inactive as 0
+    const invertAbacus = () => {
+        for (let i = 0; i < numRods; i++) {
+            const rodEl = abacusRodsContainer.querySelector(`.rod[data-index="${i}"]`);
+            if (!rodEl) continue;
+            const topBead = rodEl.querySelector('.bead.top');
+            const bottomBead = rodEl.querySelector('.bead.bottom');
+            if (!topBead || !bottomBead) continue;
+
+            const topActive = topBead.classList.contains('active');
+            const bottomActive = bottomBead.classList.contains('active');
+
+            // If exactly one side is active, swap; if both or none, keep as-is (still represents 0)
+            if (topActive && !bottomActive) {
+                topBead.classList.remove('active');
+                bottomBead.classList.add('active');
+            } else if (!topActive && bottomActive) {
+                bottomBead.classList.remove('active');
+                topBead.classList.add('active');
+            }
+            // Re-apply state to update colors and rodValues[i]
+            applyRodState(i, topBead, bottomBead);
+        }
+        updateDisplay();
+    };
+
+    if (invertButton) {
+        invertButton.addEventListener('click', invertAbacus);
+    }
 
     let didTypesetRods = false;
     const updateDisplay = async () => {
@@ -383,6 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
         typesetElements(abacusRodsContainer).then(() => { didTypesetRods = true; });
     };
 
+    updateLanguage();
     createAbacus();
 });
 
