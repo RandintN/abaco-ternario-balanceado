@@ -27,7 +27,7 @@ O nome resume a essência do projeto:
 
 Este repositório contém uma implementação interativa do 平三盤, servindo como ferramenta educacional e exploração prática de computação em base 3 balanceada.
 
-- Use aqui 👉 https://robsoncassiano.software/tools/heisanban ou aqui https://randintn.github.io/abaco-ternario-balanceado/
+- Use aqui 👉 https://robsoncassiano.software/tools/heisanban/?lang=pt-br ou aqui https://randintn.github.io/abaco-ternario-balanceado/?lang=pt-br
 - Repositório 👉 https://github.com/RandintN/abaco-ternario-balanceado
 
 ### Recursos
@@ -52,7 +52,7 @@ The name captures the project’s essence:
 
 This repository hosts an interactive implementation of the Hei-San-Ban, serving as an educational tool and a practical exploration of balanced base-3 computation.
 
-- Use it 👉 https://robsoncassiano.software/tools/heisanban or here https://randintn.github.io/abaco-ternario-balanceado/
+- Use it 👉 https://robsoncassiano.software/tools/heisanban?lang=en-us or here https://randintn.github.io/abaco-ternario-balanceado/?lang=en-us
 - Repository 👉 https://github.com/RandintN/abaco-ternario-balanceado
 
 ### Features
