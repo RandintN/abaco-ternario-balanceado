@@ -5,8 +5,8 @@
 
 <!-- Language Selector -->
 <p align="right">
-  <a href="#portugues">Português</a> ·
   <a href="#english">English</a>
+  <a href="#portugues">Português</a> ·
 </p>
 
 ---
@@ -14,30 +14,6 @@
 <div align="center">
   <img src="assets/triquetra.webp" alt="Logotipo do Hei-San-Ban" width="250"/>
 </div>
-
-
-## <a id="portugues"></a>🇧🇷 平三盤 (Hei-San-Ban): Ábaco Ternário Balanceado
-
-Inspirado no ábaco japonês Soroban, o **平三盤 (Hei-San-Ban)** é um ábaco computacional (físico ou digital) projetado para cálculos no sistema ternário balanceado. Diferente dos sistemas tradicionais, ele usa os dígitos **{-1, 0, +1}**, permitindo representar números positivos e negativos de forma simétrica.
-
-O nome resume a essência do projeto:
-- **平 (Hei):** o **equilíbrio** do sistema
-- **三 (San):** a base **três** (ternária)
-- **盤 (Ban):** a **placa/tabuleiro** de cálculo (o ábaco)
-
-Este repositório contém uma implementação interativa do 平三盤, servindo como ferramenta educacional e exploração prática de computação em base 3 balanceada.
-
-- Use aqui 👉 https://robsoncassiano.software/tools/heisanban/?lang=pt-br ou aqui https://randintn.github.io/abaco-ternario-balanceado/?lang=pt-br
-- Repositório 👉 https://github.com/RandintN/abaco-ternario-balanceado
-
-### Recursos
-- Interface responsiva e interativa (contas superiores/inferiores tocam a barra central)
-- Exibição do total em decimal e notação matemática com LaTeX
-- Conteúdo bilíngue (PT/EN) com troca por botão
-- Dicas inspiradas no Soroban e seções dobráveis de tutorial/como somar/como subtrair
-- PWA com suporte offline após a primeira visita
-
-Vida Longa e Próspera 🖖🏻
 
 ---
 
@@ -67,3 +43,26 @@ Live Long and Prosper 🖖🏻
 ---
 
 © Licensed under the terms in [LICENSE](LICENSE).
+
+## <a id="portugues"></a>🇧🇷 平三盤 (Hei-San-Ban): Ábaco Ternário Balanceado
+
+Inspirado no ábaco japonês Soroban, o **平三盤 (Hei-San-Ban)** é um ábaco computacional (físico ou digital) projetado para cálculos no sistema ternário balanceado. Diferente dos sistemas tradicionais, ele usa os dígitos **{-1, 0, +1}**, permitindo representar números positivos e negativos de forma simétrica.
+
+O nome resume a essência do projeto:
+- **平 (Hei):** o **equilíbrio** do sistema
+- **三 (San):** a base **três** (ternária)
+- **盤 (Ban):** a **placa/tabuleiro** de cálculo (o ábaco)
+
+Este repositório contém uma implementação interativa do 平三盤, servindo como ferramenta educacional e exploração prática de computação em base 3 balanceada.
+
+- Use aqui 👉 https://robsoncassiano.software/tools/heisanban/?lang=pt-br ou aqui https://randintn.github.io/abaco-ternario-balanceado/?lang=pt-br
+- Repositório 👉 https://github.com/RandintN/abaco-ternario-balanceado
+
+### Recursos
+- Interface responsiva e interativa (contas superiores/inferiores tocam a barra central)
+- Exibição do total em decimal e notação matemática com LaTeX
+- Conteúdo bilíngue (PT/EN) com troca por botão
+- Dicas inspiradas no Soroban e seções dobráveis de tutorial/como somar/como subtrair
+- PWA com suporte offline após a primeira visita
+
+Vida Longa e Próspera 🖖🏻
