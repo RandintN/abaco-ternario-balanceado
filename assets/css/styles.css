@@ -241,3 +241,226 @@ body {
     height: clamp(22px, 3.5vw, 28px);
     display: block;
 }
+
+/* ====== Top controls + menu ====== */
+:root {
+  --topbar-bg: rgba(17, 24, 39, 0.7); /* cinza-900 com transparência */
+  --topbar-text: #e5e7eb;             /* cinza-200 */
+  --topbar-border: rgba(255,255,255,0.08);
+  --topbar-height: 56px; /* altura aproximada da barra superior (botões 36px + padding 10px) */
+  --menu-bg: #111827;                 /* cinza-900 */
+  --menu-border: rgba(255,255,255,0.12);
+  --menu-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  --menu-item: #e5e7eb;
+  --menu-item-muted: #9ca3af;         /* cinza-400 */
+  --menu-item-hover: #34d399;         /* teal-400 */
+  --focus-ring: 0 0 0 3px rgba(52, 211, 153, 0.45);
+}
+
+body.dark {
+  /* Mantém as cores similares, mas pode ser ajustado conforme seu tema */
+  --topbar-bg: rgba(17, 24, 39, 0.75);
+  --topbar-text: #e5e7eb;
+  --topbar-border: rgba(255,255,255,0.12);
+  --menu-bg: #0b1220;
+  --menu-border: rgba(255,255,255,0.16);
+  --menu-item: #e5e7eb;
+  --menu-item-muted: #9ca3af;
+  --menu-item-hover: #5eead4; /* teal-300 */
+}
+
+.top-controls {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--topbar-bg);
+  color: var(--topbar-text);
+  backdrop-filter: saturate(120%) blur(6px);
+  -webkit-backdrop-filter: saturate(120%) blur(6px);
+  border-bottom: 1px solid var(--topbar-border);
+  z-index: 2147483646; /* below legacy fixed buttons we will hide */
+}
+
+.language-switcher select {
+  appearance: none;
+  background: transparent;
+  color: var(--topbar-text);
+  border: 1px solid var(--topbar-border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 14px;
+}
+.language-switcher select:focus {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.right-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-button,
+.github-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--topbar-border);
+  background: transparent;
+  color: var(--topbar-text);
+  cursor: pointer;
+  text-decoration: none;
+}
+.icon-button:hover,
+.github-button:hover {
+  background: rgba(255,255,255,0.06);
+}
+.icon-button:focus-visible,
+.github-button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.menu-wrapper { position: relative; }
+.menu-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 260px;
+  padding: 8px;
+  background: var(--menu-bg);
+  border: 1px solid var(--menu-border);
+  border-radius: 12px;
+  box-shadow: var(--menu-shadow);
+}
+.menu-item {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--menu-item);
+  text-decoration: none;
+  font-size: 14px;
+}
+.menu-item:hover,
+.menu-item:focus {
+  background: rgba(255,255,255,0.06);
+  color: var(--menu-item-hover);
+}
+
+/* Utilitários de acessibilidade */
+.visually-hidden {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden; clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap; clip-path: inset(50%);
+}
+
+/* Responsividade básica */
+@media (max-width: 480px) {
+  .menu-dropdown {
+    min-width: 220px;
+  }
+}
+
+/* Hide legacy floating controls to avoid overlap with new top bar */
+.github-link,
+.translation-button {
+  display: none !important;
+}
+
+/* Reserve space for the fixed top bar so content (e.g., logo) isn't hidden underneath */
+body {
+  padding-top: calc(var(--topbar-height) + 8px + env(safe-area-inset-top, 0px));
+}
+
+
+
+/* ===== Light theme overrides ===== */
+body.light {
+  /* Page base colors */
+  background-color: #f8fafc; /* slate-50 */
+  color: #111827; /* gray-900 */
+}
+
+/* Light theme variables for top bar and menu */
+body.light {
+  --topbar-bg: rgba(255, 255, 255, 0.75);
+  --topbar-text: #111827; /* gray-900 */
+  --topbar-border: rgba(0, 0, 0, 0.12);
+  --menu-bg: #ffffff;
+  --menu-border: rgba(0, 0, 0, 0.12);
+  --menu-item: #111827;
+  --menu-item-muted: #6b7280; /* gray-500 */
+  --menu-item-hover: #0f766e; /* teal-800 */
+}
+
+/* Component overrides in light mode */
+body.light .container {
+  background-color: #ffffff;
+  color: #111827;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+body.light .abacus {
+  background-color: #e5e7eb; /* gray-200 */
+  border-color: #94a3b8; /* slate-400 */
+}
+body.light .center-bar { background-color: #111827; }
+body.light .rod-line { background-color: #64748b; }
+body.light .power-label,
+body.light .power-label-top { color: #475569; }
+body.light .value-labels span { color: #111827; }
+
+/* Common text blocks in light mode */
+body.light #main-title,
+body.light #total-title,
+body.light #footer-sum-title { color: #0f766e; }
+body.light #description,
+body.light #math-notation,
+body.light .text-gray-400,
+body.light .text-gray-300 { color: #475569 !important; }
+
+/* Buttons (clear/invert) retain contrast in light mode */
+body.light #clear-button,
+body.light #invert-button {
+  background-color: #e5e7eb; /* gray-200 */
+  color: #111827;
+  border-color: #cbd5e1; /* slate-300 */
+}
+body.light #clear-button:hover,
+body.light #invert-button:hover {
+  background-color: #cbd5e1; /* slate-300 */
+}
+
+/* Collapsible sections backgrounds */
+body.light #tutorial-content,
+body.light #sum-content {
+  background-color: #f1f5f9; /* slate-100 */
+  color: #111827;
+}
+
+/* Override Tailwind utility classes used in HTML so they look good in light */
+body.light .bg-gray-800 { background-color: #ffffff !important; }
+body.light .bg-gray-700 { background-color: #f1f5f9 !important; }
+body.light .text-gray-100 { color: #111827 !important; }
+body.light .text-white { color: #111827 !important; }
+body.light .text-gray-200 { color: #1f2937 !important; }
+
+/* Triquetra logo spacing unchanged; ensure it contrasts with light bg via surrounding colors */
+body.light .triquetra-logo { filter: none; }
+
+/* Top controls buttons inherit text color; ensure hover backgrounds are subtle in light */
+body.light .icon-button:hover,
+body.light .github-button:hover {
+  background: rgba(0,0,0,0.06);
+}

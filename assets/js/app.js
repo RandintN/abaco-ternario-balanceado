@@ -439,6 +439,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Expose a global setter so the new <select id="lang-select"> can drive page translations too
+    window.setPageLanguage = function(lang, opts) {
+        try {
+            const safe = (lang === 'en' || lang === 'pt') ? lang : 'en';
+            if (currentLang !== safe) {
+                currentLang = safe;
+                updateLanguage();
+            } else {
+                // Even if the same, ensure meta/title/texts reflect any later DOM changes
+                updateLanguage();
+            }
+            if (!opts || !opts.suppressUrl) {
+                updateUrlForLang(currentLang, false);
+            }
+        } catch (_) { /* no-op */ }
+    };
+
     const createAbacus = () => {
         abacusRodsContainer.innerHTML = '';
         for (let i = 0; i < numRods; i++) {
