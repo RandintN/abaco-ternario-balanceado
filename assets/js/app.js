@@ -508,10 +508,59 @@ document.addEventListener('DOMContentLoaded', () => {
     createAbacus();
 });
 
-// Register Service Worker for offline support
+// Register Service Worker for offline support with auto-refresh on update
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('service-worker.js')
-      .catch(function (err) { console.warn('SW registration failed', err); });
+  const swUrl = 'service-worker.js';
+  let hasRefreshed = false;
+
+  function forceReloadOnce() {
+    if (hasRefreshed) return;
+    hasRefreshed = true;
+    // Ensure all assets are fetched fresh
+    if (location.search.includes('hard-refresh=1')) {
+      location.reload();
+    } else {
+      const url = new URL(location.href);
+      url.searchParams.set('hard-refresh', '1');
+      location.replace(url.toString());
+    }
+  }
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    // New SW controlling the page; reload to pick new assets
+    forceReloadOnce();
+  });
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(swUrl).then((reg) => {
+      // If there's an updated worker waiting, ask it to activate immediately
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+
+      // If a new worker is installing, listen for when it's ready
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed') {
+            // If there's an existing controller, a new version is available
+            if (navigator.serviceWorker.controller) {
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+            }
+          }
+        });
+      });
+    }).catch((err) => {
+      console.warn('SW registration failed', err);
+    });
+  });
+
+  // Listen for messages from the SW (e.g., activation notice)
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    const data = event.data || {};
+    if (data.type === 'SW_ACTIVATED') {
+      forceReloadOnce();
+    }
   });
 }

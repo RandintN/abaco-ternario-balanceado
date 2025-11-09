@@ -6,7 +6,7 @@
   Caches core app shell and provides runtime caching for other requests (e.g., CDN assets).
 */
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const APP_CACHE = `abaco-cache-${CACHE_VERSION}`;
 const RUNTIME_CACHE = 'runtime-cache';
 
@@ -41,8 +41,21 @@ self.addEventListener('activate', (event) => {
         return undefined;
       }));
       await self.clients.claim();
+      // Notify all clients that a new service worker is active
+      const clientsList = await self.clients.matchAll({ type: 'window' });
+      for (const client of clientsList) {
+        client.postMessage({ type: 'SW_ACTIVATED', version: CACHE_VERSION });
+      }
     })()
   );
+});
+
+// Allow the page to request immediate activation
+self.addEventListener('message', (event) => {
+  if (!event.data) return;
+  if (event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('fetch', (event) => {
